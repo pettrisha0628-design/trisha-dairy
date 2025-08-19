@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Popup Register</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #b2f0e7;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Register Button */
+    .open-btn {
+      padding: 12px 24px;
+      font-size: 18px;
+      background: #ff914d;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .open-btn:hover {
+      background: #ff751a;
+    }
+
+    /* Overlay (dark background) */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Popup Container */
+    .popup {
+      display: flex;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      width: 850px;
+      max-width: 95%;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: scale(0.9);}
+      to {opacity: 1; transform: scale(1);}
+    }
+
+    /* Left: Form */
+    .form-section {
+      background: #ffb987;
+      padding: 40px;
+      flex: 1.2;
+      position: relative;
+    }
+
+    .form-section img.logo {
+      height: 60px;
+      margin-bottom: 20px;
+    }
+
+    .form-section h2 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-bottom: 1px solid #333;
+      background: transparent;
+      outline: none;
+      font-size: 15px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: #e6e6e6;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      border-radius: 4px;
+    }
+
+    .btn:hover {
+      background: #d3d3d3;
+    }
+
+    .login-text {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .login-text a {
+      text-decoration: none;
+      color: #444;
+      font-weight: bold;
+    }
+
+    /* Right: Image */
+    .image-section {
+      flex: 1;
+      background: #b2f0e7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .image-section img {
+      max-width: 100%;
+      border-radius: 6px;
+    }
+
+    /* Close Button */
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 22px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #333;
+    }
+    .close-btn:hover {
+      color: red;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Button to Open Popup -->
+  <button class="open-btn" onclick="openPopup()">Register</button>
+
+  <!-- Overlay + Popup -->
+  <div class="overlay" id="popupOverlay">
+    <div class="popup">
+      <!-- Left: Form -->
+      <div class="form-section">
+        <span class="close-btn" onclick="closePopup()">&times;</span>
+        <img src="logo.png" alt="Dairy Logo" class="logo">
+        <h2>Register</h2>
+
+        <form>
+          <div class="form-group">
+            <input type="text" placeholder="Name" required>
+          </div>
+          <div class="form-group">
+            <input type="tel" placeholder="Phone no" required>
+          </div>
+          <div class="form-group">
+            <input type="password" placeholder="Create Password" required>
+          </div>
+          <div class="form-group">
+            <input type="password" placeholder="Confirm Password" required>
+          </div>
+          <button type="submit" class="btn">Register</button>
+        </form>
+
+        <div class="login-text">
+          Already Have an Account? <a href="login.html">Login Now</a>
+        </div>
+      </div>
+
+      <!-- Right: Image -->
+      <div class="image-section">
+        <img src="dairy-friends.png" alt="Dairy Friends">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openPopup() {
+      document.getElementById("popupOverlay").style.display = "flex";
+    }
+    function closePopup() {
+      document.getElementById("popupOverlay").style.display = "none";
+    }
+  </script>
+
+</body>
+</html>

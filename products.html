@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dairy Products - Products</title>
+  <style>
+    /* ---------- Base ---------- */
+    :root{
+      --mint:#b2f0e7;
+      --peach:#ffb987;
+      --brand:#0077cc;
+      --peach-dark:#ffa869;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background-color:var(--mint);
+    }
+
+    /* ---------- Header ---------- */
+    header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px 40px;background:#fff;
+      box-shadow:0 2px 6px rgba(0,0,0,.1);
+      position:sticky;top:0;z-index:1000;
+    }
+    .logo img{height:60px}
+    nav ul{list-style:none;margin:0;padding:0;display:flex;gap:25px}
+    nav a{
+      text-decoration:none;font-weight:bold;color:#000;transition:.2s;
+      padding:6px 10px;border-radius:6px;
+    }
+    nav a:hover{color:var(--brand)}
+    nav a.active{color:#fff;background:var(--brand)}
+
+    /* ---------- Product grid ---------- */
+    .products{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+      gap:30px;padding:40px;
+    }
+    .product-card{
+      background:var(--peach-dark);border-radius:12px;text-align:center;
+      padding:20px;box-shadow:0 4px 10px rgba(0,0,0,.15);
+      transition:transform .3s;border:4px solid #000;
+    }
+    .product-card:hover{transform:translateY(-5px)}
+    .product-card img{height:120px;margin-bottom:25px}
+    .product-card h3{margin:0;font-size:20px}
+    .product-card p{font-size:16px;margin-top:8px;font-weight:bold}
+    .cart-btn,.buy-btn{
+      margin:8px 6px 0 6px;padding:10px 18px;border:none;border-radius:6px;
+      font-size:15px;font-weight:bold;cursor:pointer;transition:.2s;
+    }
+    .cart-btn{background:#fff;color:var(--brand);border:2px solid var(--brand)}
+    .cart-btn:hover{background:var(--brand);color:#fff}
+    .buy-btn{background:var(--brand);color:#fff}
+    .buy-btn:hover{background:#005fa3}
+
+    /* ---------- Modal (popup) ---------- */
+    .modal{
+      position:fixed;inset:0;display:none; /* shown with .show */
+      align-items:center;justify-content:center;
+      background:rgba(0,0,0,.5);z-index:2000;padding:20px;
+    }
+    .modal.show{display:flex}
+    .auth-box{
+      width:min(900px,95vw);display:flex;overflow:hidden;border-radius:18px;
+      box-shadow:0 12px 30px rgba(0,0,0,.35);background:#fff;
+      animation:pop .25s ease;
+    }
+    @keyframes pop{from{transform:scale(.96);opacity:.85}to{transform:scale(1);opacity:1}}
+
+    /* Left (form) */
+    .auth-form{
+      flex:1.2;background:var(--peach);padding:40px;position:relative;
+    }
+    .auth-form .logo{position:absolute;top:18px;left:18px}
+    .auth-form .logo img{height:56px}
+    .auth-form h2{margin:0 0 24px;text-align:center}
+    .field{margin:16px 0}
+    .field input{
+      width:100%;padding:12px;border:none;border-bottom:1px solid #333;
+      background:transparent;outline:none;font-size:15px;
+    }
+    .submit{
+      width:100%;padding:14px;background:#e6e6e6;border:none;
+      font-size:16px;font-weight:bold;border-radius:6px;margin-top:12px;cursor:pointer;
+    }
+    .submit:hover{background:#d3d3d3}
+    .switch{
+      text-align:center;margin-top:14px;font-size:14px;
+    }
+    .switch button{
+      background:none;border:none;color:#333;text-decoration:underline;cursor:pointer;
+      font-weight:bold;
+    }
+
+    /* Right (illustration) */
+    .auth-ill{
+      flex:1;background:var(--mint);display:flex;align-items:center;justify-content:center;
+      padding:20px;
+    }
+    .auth-ill img{max-width:100%;border-radius:10px}
+
+    /* Close (X) */
+    .close{
+      position:absolute;top:12px;right:16px;border:none;background:none;
+      font-size:24px;cursor:pointer;color:#333
+    }
+
+    /* Hide the panel not in use */
+    .panel{display:none}
+    .panel.active{display:block}
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo"><img src="logo.png" alt="Dairy Logo"></div>
+    <nav>
+      <ul>
+        <li><a href="landing_page.html">Home</a></li>
+        <li><a href="products.html" class="active">Products</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="search.html">Search</a></li>
+        <li><a href="#" id="openAuth">Login/Register</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Products -->
+  <section class="products">
+    <div class="product-card">
+      <img src="milk.png" alt="Milk">
+      <h3>Milk</h3><p>₹ 20 / 500ml</p>
+      <button class="cart-btn">Add to Cart</button>
+      <button class="buy-btn">Order</button>
+    </div>
+
+    <div class="product-card">
+      <img src="curd.png" alt="Curd">
+      <h3>Curd</h3><p>₹ 34 / 500ml</p>
+      <button class="cart-btn">Add to Cart</button>
+      <button class="buy-btn">Order</button>
+    </div>
+
+    <div class="product-card">
+      <img src="yogurt.png" alt="Yogurt">
+      <h3>Yogurt</h3><p>₹ 40 / 500ml</p>
+      <button class="cart-btn">Add to Cart</button>
+      <button class="buy-btn">Order</button>
+    </div>
+
+    <div class="product-card">
+      <img src="cheese.png" alt="Cheese">
+      <h3>Cheese</h3><p>₹ 60</p>
+      <button class="cart-btn">Add to Cart</button>
+      <button class="buy-btn">Order</button>
+    </div>
+
+    <div class="product-card">
+      <img src="paneer.png" alt="Paneer">
+      <h3>Paneer</h3><p>₹ 80</p>
+      <button class="cart-btn">Add to Cart</button>
+      <button class="buy-btn">Order</button>
+    </div>
+
+    <div class="product-card">
+      <img src="ghee.png" alt="Ghee">
+      <h3>Ghee</h3><p>₹ 100</p>
+      <button class="cart-btn">Add to Cart</button>
+      <button class="buy-btn">Order</button>
+    </div>
+  </section>
+
+  <!-- ************ AUTH MODAL (Login + Register) ************ -->
+  <div class="modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="auth-box">
+      <!-- Left: forms (two panels we can switch) -->
+      <div class="auth-form">
+        <button class="close" aria-label="Close" id="closeAuth">&times;</button>
+        <div class="logo"><img src="logo.png" alt="Dairy Logo"></div>
+
+        <!-- LOGIN -->
+        <div class="panel active" id="loginPanel">
+          <h2 id="authTitle">Login</h2>
+          <div class="field"><input type="text" placeholder="Name" /></div>
+          <div class="field"><input type="password" placeholder="Password" /></div>
+          <button class="submit">Login</button>
+          <div class="switch">
+            Don’t have an account?
+            <button type="button" id="toRegister">Sign up</button>
+          </div>
+        </div>
+
+        <!-- REGISTER -->
+        <div class="panel" id="registerPanel">
+          <h2>Register</h2>
+          <div class="field"><input type="text" placeholder="Name" /></div>
+          <div class="field"><input type="tel" placeholder="Phone no" /></div>
+          <div class="field"><input type="password" placeholder="Create Password" /></div>
+          <div class="field"><input type="password" placeholder="Confirm Password" /></div>
+          <button class="submit">Register</button>
+          <div class="switch">
+            Already have an account?
+            <button type="button" id="toLogin">Login</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: illustration -->
+      <div class="auth-ill">
+        <img src="dairy-friends.png" alt="Dairy illustration">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Elements
+    const modal = document.getElementById('authModal');
+    const closeBtn = document.getElementById('closeAuth');
+    const openAuth = document.getElementById('openAuth');
+    const toRegister = document.getElementById('toRegister');
+    const toLogin = document.getElementById('toLogin');
+    const loginPanel = document.getElementById('loginPanel');
+    const registerPanel = document.getElementById('registerPanel');
+
+    // Open helpers
+    function openModal(mode = 'login'){
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden'; // prevent page scroll
+      if(mode === 'register'){
+        loginPanel.classList.remove('active');
+        registerPanel.classList.add('active');
+      }else{
+        registerPanel.classList.remove('active');
+        loginPanel.classList.add('active');
+      }
+    }
+    function closeModal(){
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    // Open from navbar
+    if(openAuth) openAuth.addEventListener('click', e => { e.preventDefault(); openModal('login'); });
+
+    // Add to Cart buttons -> open Register
+    document.querySelectorAll('.cart-btn').forEach(btn=>{
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        openModal('register');   // open the register panel directly
+      });
+    });
+
+    // Switch between panels inside modal
+    toRegister.addEventListener('click', ()=> openModal('register'));
+    toLogin.addEventListener('click', ()=> openModal('login'));
+
+    // Close interactions
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if(e.target === modal) closeModal(); });
+    document.addEventListener('keydown', e => { if(e.key === 'Escape' && modal.classList.contains('show')) closeModal(); });
+  </script>
+</body>
+</html>

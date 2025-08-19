@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search - Trisha's Dairy</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #b2f0f0; /* light cyan like About page */
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 40px;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logo img {
+      height: 60px;
+    }
+
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: 25px;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      font-weight: 600;
+      color: #000;
+      transition: color 0.3s, background 0.3s;
+      font-family: 'Poppins', sans-serif;
+      padding: 6px 14px;
+      border-radius: 6px;
+    }
+
+    nav ul li a.active {
+      color: #fff;
+      background: #0077cc;
+    }
+
+    /* Search Card */
+    .search-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 70vh;
+    }
+
+    .search-box {
+      background: #ffa559; /* orange card like About page */
+      padding: 40px;
+      border-radius: 12px;
+      text-align: center;
+      width: 400px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .search-box h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #000;
+      text-decoration: underline;
+    }
+
+    .search-input {
+      padding: 12px;
+      width: 80%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .search-btn {
+      padding: 12px 20px;
+      border: none;
+      background: #0077cc;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+
+    .search-btn:hover {
+      background: #005fa3;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Common Header -->
+  <header>
+    <div class="logo">
+      <img src="logo.png" alt="Dairy Logo">
+    </div>
+    <nav>
+      <ul>
+        <li><a href="landing_page.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="search.html" class="active">Search</a></li>
+        <li><a href="register.html">Login/Register</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Search Section -->
+  <div class="search-container">
+    <div class="search-box">
+      <h2>Search Products</h2>
+      <input type="text" class="search-input" placeholder="Search here...">
+      <br>
+      <button class="search-btn">🔍 Search</button>
+    </div>
+  </div>
+
+</body>
+</html>

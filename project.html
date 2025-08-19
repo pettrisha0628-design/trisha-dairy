@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    body {
+        background-color: #a5e4e4;
+        font-family: Arial, sans-serif;
+        height: 100vh;
+    }
+
+    /* Milk splash background at the top */
+    .milk-splash-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 110px; /* Adjust to your image height */
+        background: url('milk_splash.png') repeat-x top left;
+        background-size: cover;
+        z-index: 1;
+    }
+
+    /* Logo in the top left */
+    .logo {
+        position: fixed;
+        top: 20px;
+        left: 40px;
+        width: 90px; /* Adjust as needed */
+        height: auto;
+        z-index: 2;
+    }
+
+    /* Centered login box */
+    .login-container {
+        background-color: #e89b66;
+        width: 480px; /* Bigger width */
+        padding: 50px; /* More padding */
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+        position: absolute;
+        top: 55%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 3;
+    }
+
+    .login-container h2 {
+        margin-bottom: 28px;
+        font-size: 2rem;
+        font-weight: bold;
+    }
+
+    .login-container input {
+        width: 100%;
+        padding: 12px;
+        margin: 14px 0;
+        border: none;
+        border-bottom: 2px solid #000;
+        outline: none;
+        background: transparent;
+        font-size: 18px;
+    }
+
+    .options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 15px;
+        margin: 16px 0;
+    }
+
+    .login-container a {
+        text-decoration: none;
+        color: blue;
+    }
+
+    .signup {
+        margin-top: 20px;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+    <!-- Milk splash background at the top -->
+    <div class="milk-splash-bg"></div>
+    <!-- Logo in the top left -->
+    <img src="logo.png" alt="Dairy Products Logo" class="logo">
+
+    <!-- Center login form -->
+    <div class="login-container">
+        <h2>Admin Login</h2>
+        <input type="text" placeholder="User Name">
+        <input type="password" placeholder="Password">
+        
+        <div class="options">
+            <label><input type="checkbox"> Remember me</label>
+            <a href="#">Forgot Password?</a>
+        </div>
+        
+        <div class="signup">
+            New Admin? <a href="#">Sign up</a>
