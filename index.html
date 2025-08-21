@@ -1,17 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dairy Products</title>
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trisha's Dairy - Fresh from Farm to Family</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --primary: #e8eaed;
+      --secondary: #d1d5db;
+      --accent1: #6b7280;
+      --accent2: #4f46e5;
+      --text: #374151;
+      --shadow: rgba(107, 114, 128, 0.2);
+    }
+
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
+      background: var(--primary);
+      color: var(--text);
       overflow-x: hidden;
     }
 
@@ -21,19 +29,17 @@
       align-items: center;
       justify-content: space-between;
       padding: 10px 40px;
-      background: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      background: var(--primary);
+      box-shadow: 0 2px 8px var(--shadow);
       position: sticky;
       top: 0;
       z-index: 1000;
     }
 
-    /* Logo */
     .logo img {
       height: 60px;
     }
 
-    /* Navbar */
     nav ul {
       list-style: none;
       margin: 0;
@@ -45,38 +51,55 @@
     nav ul li a {
       text-decoration: none;
       font-weight: 600;
-      color: #000;
-      transition: color 0.3s;
-      font-family: 'Poppins', sans-serif;
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    nav ul li a:hover {
+      background: var(--accent1);
+      color: var(--primary);
     }
 
     nav ul li a.active {
-      color: #fff;
-      background: #0077cc;
-      border-radius: 6px;
-      padding: 6px 14px;
+      background: var(--accent2);
+      color: var(--primary);
     }
 
     /* Hero Section */
     .hero {
       position: relative;
       text-align: center;
-      height: 650px; /* Adjust as needed */
+      height: 640px;
       overflow: hidden;
     }
 
     .video-bg {
       position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       z-index: 0;
       pointer-events: none;
-      overflow: hidden;
+    }
+
+    .video-bg::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(107, 114, 128, 0.25);
+      z-index: 1;
     }
 
     .video-bg iframe {
-        position: absolute;
-        top: 50%;
-        left:50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
       width: 120vw;
       height: 700vh;
       min-width: 100%;
@@ -87,46 +110,52 @@
       border: none;
     }
 
-    /* Quotes Styling */
     .quote {
       position: absolute;
-      top: 50%;
+      top: 45%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 38px;
-      font-weight: 600;
+      font-size: 40px;
+      font-weight: 700;
       font-family: 'Playfair Display', serif;
-      color: #000000;
-      text-shadow: 2px 2px 8px rgba(30, 28, 28, 0.1);
-      background: rgba(176, 176, 176, 0.6); /* semi-transparent white */
-      padding: 24px 40px;
-      border-radius: 18px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      color: var(--text);
+      background: rgba(232, 234, 237, 0.92);
+      padding: 28px 54px;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px var(--shadow);
+      border: 2px solid var(--accent1);
       display: inline-block;
-      z-index: 1;
+      z-index: 3;
+      animation: fadein 1.6s ease;
+    }
+
+    @keyframes fadein {
+      from { opacity: 0; transform: translate(-50%, -80%); }
+      to { opacity: 1; transform: translate(-50%, -50%); }
     }
   </style>
 </head>
 <body>
-
   <header>
     <div class="logo">
-      <img src="logo.png" alt="Dairy Logo">
+      <img src="logo.png" alt="Trisha's Dairy Logo" />
     </div>
     <nav>
-      <ul>
-        <li><a href="index.html" class="active">Home</a></li>
-        <li><a href="products.html">Products</a></li>
-        <li><a href="about.html">About Us</a></li>
-        <li><a href="#">Search</a></li>
-        <li><a href="register.html">Login/Register</a></li>
-      </ul>
-    </nav>
+  <ul>
+    <li><a href="index.html" class ="active">Home</a></li>
+    <li><a href="products.html">Products</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="search.html">Search</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="login.html">Login/Register</a></li>
+  </ul>
+</nav>
+
   </header>
 
   <section class="hero">
     <div class="video-bg">
-      <iframe 
+      <iframe
         src="https://www.youtube.com/embed/yYSkAbvqNB8?autoplay=1&mute=1&controls=0&loop=1&playlist=yYSkAbvqNB8&showinfo=0&modestbranding=1"
         frameborder="0"
         allow="autoplay; encrypted-media"
@@ -137,6 +166,5 @@
       "Fresh from the farm, pure for your family."
     </div>
   </section>
-
 </body>
 </html>

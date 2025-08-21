@@ -1,130 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About Us - Trisha's Dairy</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #b2f0e7;
+    :root {
+      --primary: #e8eaed;
+      --secondary: #d1d5db;
+      --accent1: #6b7280;
+      --accent2: #4f46e5;
+      --text: #374151;
+      --shadow: rgba(107, 114, 128, 0.2);
     }
 
-    /* Navigation Bar */
-    nav {
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--primary);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 10px 40px;
-      background: #fff;
-      border-bottom: 2px solid #a3d8d1;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      background: var(--primary);
+      box-shadow: 0 2px 8px var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
-    nav img {
-      height: 50px;
+    .logo img {
+      height: 60px;
     }
 
-    .nav-links {
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
       display: flex;
-      gap: 30px;
+      gap: 25px;
     }
 
-    .nav-links a {
+    nav ul li a {
       text-decoration: none;
-      font-weight: bold;
-      color: #000;
-      padding: 6px 12px;
-      border-radius: 6px;
-      transition: 0.3s;
+      font-weight: 600;
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.3s;
     }
 
-    .nav-links a:hover {
-      background: #007bff;
-      color: #fff;
+    nav ul li a:hover {
+      background: var(--accent1);
+      color: var(--primary);
     }
 
-    .nav-links .active {
-      background: #007bff;
-      color: #fff;
+    nav ul li a.active {
+      background: var(--accent2);
+      color: var(--primary);
     }
 
-    /* About Us Section */
-    .about-section {
-      max-width: 900px;
-      margin: 30px auto;
-      padding: 20px;
-      background: #ffa869;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 40px;
     }
 
-    .about-section h2 {
+    .hero-section {
       text-align: center;
-      font-size: 28px;
+      margin-bottom: 60px;
+    }
+
+    .hero-section h1 {
+      font-size: 3rem;
+      color: var(--accent2);
       margin-bottom: 20px;
-      border-bottom: 2px solid #000;
-      display: inline-block;
-      padding-bottom: 6px;
+      font-weight: 700;
     }
 
-    .about-section h3 {
+    .hero-section p {
+      font-size: 1.2rem;
+      color: var(--accent1);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 40px;
+      margin-top: 40px;
+    }
+
+    .content-card {
+      background: var(--secondary);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px var(--shadow);
+      transition: transform 0.3s ease;
+    }
+
+    .content-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .content-card h3 {
+      font-size: 1.8rem;
+      color: var(--accent2);
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .content-card p {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    .highlight {
+      background: var(--accent2);
+      color: var(--primary);
+      padding: 40px;
+      border-radius: 16px;
       text-align: center;
-      font-size: 20px;
-      margin: 25px 0 10px;
-      font-style: italic;
+      margin: 60px 0;
     }
 
-    .about-section p {
-      font-size: 16px;
-      line-height: 1.6;
-      text-align: justify;
+    .highlight h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      font-weight: 700;
     }
-    
-  footer {
-    text-align: center;
-  }
-  
+
+    .highlight p {
+      font-size: 1.3rem;
+      opacity: 0.9;
+    }
   </style>
 </head>
 <body>
-
-  <!-- Navigation Bar -->
-  <nav>
-    <img src="logo.png" alt="Dairy Logo">
-    <div class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="products.html">Products</a>
-      <a href="about.html" class="active">About Us</a>
-      <a href="search.html">Search</a>
-      <a href="login.html">Login/Register</a>
+  <header>
+    <div class="logo">
+      <img src="logo.png" alt="Trisha's Dairy Logo" />
     </div>
-  </nav>
+   <nav>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="products.html">Products</a></li>
+    <li><a href="about.html" classs = "active">About Us</a></li>
+    <li><a href="search.html">Search</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="login.html">Login/Register</a></li>
+  </ul>
+</nav>
 
-  <!-- About Us Content -->
-  <section class="about-section">
-    <h2>About Us</h2>
+    </nav>
+  </header>
 
-    <h3>Who are we ?</h3>
-    <p>
-      Trisha’s Dairy is a corporate citizen who understands the enormous significance of hygienic milk and dairy products for agro and industrial development. Leveraging the strength of superior product offerings, Trisha’s Dairy has strategized its foray into the consumer market, with the aim of being the market leader, earning respect and revenue for the stakeholders.
-    </p>
+  <div class="container">
+    <div class="hero-section">
+      <h1>About Trisha's Dairy</h1>
+      <p>Your trusted partner for fresh, hygienic, and high-quality dairy products</p>
+    </div>
 
-    <h3>Our mission</h3>
-    <p>
-      Our mission is to become the premier retailer of high-quality food products in India. To achieve this goal, we are committed to passionately focusing on customer value, being intolerant of waste, and serving as responsible citizens in our communities.
-    </p>
+    <div class="content-grid">
+      <div class="content-card">
+        <h3>Our Story</h3>
+        <p>Trisha's Dairy is a corporate citizen who understands the enormous significance of hygienic milk and dairy products for agro and industrial development. Leveraging the strength of superior product offerings, Trisha's Dairy has strategized its foray into the consumer market, with the aim of being the market leader, earning respect and revenue for the stakeholders.</p>
+      </div>
 
-    <h3>Our vision</h3>
-    <p>
-      Our aim is to meet the diverse needs of consumers every day by marketing and selling foods that are consistent and of high quality.
-    </p>
-  </section>
-   <footer>
+      <div class="content-card">
+        <h3>Our Mission</h3>
+        <p>Our mission is to become the premier retailer of high-quality food products in India. To achieve this goal, we are committed to passionately focusing on customer value, being intolerant of waste, and serving as responsible citizens in our communities.</p>
+      </div>
 
-    <a href="landing_page.html"> Back to Home </a>
-   </footer>
+      <div class="content-card">
+        <h3>Our Promise</h3>
+        <p>Our aim is to meet the diverse needs of consumers every day by marketing and selling foods that are consistent and of high quality. We ensure that every product that reaches your table meets the highest standards of freshness and purity.</p>
+      </div>
 
+      <div class="content-card">
+        <h3>Quality Assurance</h3>
+        <p>We maintain strict quality control measures throughout our supply chain, from farm to your family. Our state-of-the-art processing facilities and rigorous testing ensure that you receive only the best dairy products.</p>
+      </div>
+    </div>
+
+    <div class="highlight">
+      <h2>Fresh from Farm to Family</h2>
+      <p>Experience the pure taste of nature with Trisha's Dairy products</p>
+    </div>
+  </div>
 </body>
 </html>

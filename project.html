@@ -1,117 +1,342 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Login</title>
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    html, body {
-        height: 100vh;
-        overflow: hidden;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Overview - Trisha's Dairy</title>
+  <style>
+    :root {
+      --primary: #e8eaed;
+      --secondary: #d1d5db;
+      --accent1: #6b7280;
+      --accent2: #4f46e5;
+      --text: #374151;
+      --shadow: rgba(107, 114, 128, 0.2);
     }
 
     body {
-        background-color: #a5e4e4;
-        font-family: Arial, sans-serif;
-        height: 100vh;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--primary);
+      color: var(--text);
+      line-height: 1.6;
     }
 
-    /* Milk splash background at the top */
-    .milk-splash-bg {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 110px; /* Adjust to your image height */
-        background: url('milk_splash.png') repeat-x top left;
-        background-size: cover;
-        z-index: 1;
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 40px;
+      background: var(--primary);
+      box-shadow: 0 2px 8px var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
-    /* Logo in the top left */
-    .logo {
-        position: fixed;
-        top: 20px;
-        left: 40px;
-        width: 90px; /* Adjust as needed */
-        height: auto;
-        z-index: 2;
+    .logo img {
+      height: 60px;
     }
 
-    /* Centered login box */
-    .login-container {
-        background-color: #e89b66;
-        width: 480px; /* Bigger width */
-        padding: 50px; /* More padding */
-        border-radius: 16px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-        position: absolute;
-        top: 55%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        z-index: 3;
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: 25px;
     }
 
-    .login-container h2 {
-        margin-bottom: 28px;
-        font-size: 2rem;
-        font-weight: bold;
+    nav ul li a {
+      text-decoration: none;
+      font-weight: 600;
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.3s;
     }
 
-    .login-container input {
-        width: 100%;
-        padding: 12px;
-        margin: 14px 0;
-        border: none;
-        border-bottom: 2px solid #000;
-        outline: none;
-        background: transparent;
-        font-size: 18px;
+    nav ul li a:hover {
+      background: var(--accent1);
+      color: var(--primary);
     }
 
-    .options {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 15px;
-        margin: 16px 0;
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 40px;
     }
 
-    .login-container a {
-        text-decoration: none;
-        color: blue;
+    .hero-section {
+      text-align: center;
+      margin-bottom: 80px;
     }
 
-    .signup {
-        margin-top: 20px;
-        font-weight: bold;
+    .hero-section h1 {
+      font-size: 3.5rem;
+      color: var(--accent2);
+      margin-bottom: 20px;
+      font-weight: 700;
     }
-</style>
+
+    .hero-section p {
+      font-size: 1.3rem;
+      color: var(--accent1);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+      margin-bottom: 80px;
+    }
+
+    .feature-card {
+      background: var(--secondary);
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 8px 32px var(--shadow);
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 60px rgba(79, 70, 229, 0.15);
+    }
+
+    .feature-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--accent2);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 25px;
+      font-size: 2rem;
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .feature-card h3 {
+      font-size: 1.8rem;
+      color: var(--accent2);
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .feature-card p {
+      font-size: 1.1rem;
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .tech-stack {
+      background: var(--secondary);
+      padding: 60px 40px;
+      border-radius: 20px;
+      margin-bottom: 80px;
+    }
+
+    .tech-stack h2 {
+      text-align: center;
+      font-size: 2.5rem;
+      color: var(--accent2);
+      margin-bottom: 40px;
+      font-weight: 700;
+    }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 30px;
+    }
+
+    .tech-item {
+      text-align: center;
+      padding: 25px;
+      background: var(--primary);
+      border-radius: 12px;
+      transition: transform 0.3s;
+    }
+
+    .tech-item:hover {
+      transform: scale(1.05);
+    }
+
+    .tech-item h4 {
+      color: var(--accent2);
+      margin: 15px 0 10px;
+      font-weight: 600;
+    }
+
+    .tech-item p {
+      color: var(--accent1);
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .cta-section {
+      background: var(--accent2);
+      color: var(--primary);
+      padding: 60px 40px;
+      border-radius: 20px;
+      text-align: center;
+    }
+
+    .cta-section h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .cta-section p {
+      font-size: 1.2rem;
+      margin-bottom: 40px;
+      opacity: 0.9;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 16px 32px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--accent2);
+    }
+
+    .btn-primary:hover {
+      background: var(--secondary);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--primary);
+      color: var(--accent2);
+    }
+  </style>
 </head>
 <body>
+  <header>
+    <div class="logo">
+      <img src="logo.png" alt="Trisha's Dairy Logo" />
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="search.html">Search</a></li>
+        <li><a href="login.html">Login/Register</a></li>
+      </ul>
+    </nav>
+  </header>
 
-    <!-- Milk splash background at the top -->
-    <div class="milk-splash-bg"></div>
-    <!-- Logo in the top left -->
-    <img src="logo.png" alt="Dairy Products Logo" class="logo">
+  <div class="container">
+    <div class="hero-section">
+      <h1>Trisha's Dairy Website</h1>
+      <p>A comprehensive e-commerce platform for fresh dairy products, featuring user management, admin dashboard, and seamless shopping experience.</p>
+    </div>
 
-    <!-- Center login form -->
-    <div class="login-container">
-        <h2>Admin Login</h2>
-        <input type="text" placeholder="User Name">
-        <input type="password" placeholder="Password">
-        
-        <div class="options">
-            <label><input type="checkbox"> Remember me</label>
-            <a href="#">Forgot Password?</a>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🛒</div>
+        <h3>E-Commerce Platform</h3>
+        <p>Full-featured online store with product catalog, shopping cart, and secure checkout process for dairy products.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">👥</div>
+        <h3>User Management</h3>
+        <p>Complete user registration, login system with personalized dashboards and order tracking capabilities.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Admin Dashboard</h3>
+        <p>Powerful admin interface for managing products, orders, deliveries, and customer feedback efficiently.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Smart Search</h3>
+        <p>Advanced search functionality with filters to help customers find their favorite dairy products quickly.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3>Responsive Design</h3>
+        <p>Mobile-first design that works seamlessly across all devices and screen sizes for optimal user experience.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>Modern UI/UX</h3>
+        <p>Clean, intuitive interface with consistent color scheme and smooth animations for engaging user experience.</p>
+      </div>
+    </div>
+
+    <div class="tech-stack">
+      <h2>Technology Stack</h2>
+      <div class="tech-grid">
+        <div class="tech-item">
+          <h4>HTML5</h4>
+          <p>Semantic markup</p>
         </div>
-        
-        <div class="signup">
-            New Admin? <a href="#">Sign up</a>
+        <div class="tech-item">
+          <h4>CSS3</h4>
+          <p>Modern styling</p>
+        </div>
+        <div class="tech-item">
+          <h4>JavaScript</h4>
+          <p>Interactive features</p>
+        </div>
+        <div class="tech-item">
+          <h4>Responsive</h4>
+          <p>Mobile-friendly</p>
+        </div>
+        <div class="tech-item">
+          <h4>Grid/Flexbox</h4>
+          <p>Modern layouts</p>
+        </div>
+        <div class="tech-item">
+          <h4>Animations</h4>
+          <p>Smooth transitions</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-section">
+      <h2>Experience Fresh Dairy Products</h2>
+      <p>Join thousands of satisfied customers who trust Trisha's Dairy for their daily dairy needs.</p>
+      <div class="cta-buttons">
+        <a href="products.html" class="btn btn-primary">Shop Now</a>
+        <a href="register.html" class="btn btn-secondary">Create Account</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
