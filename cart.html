@@ -59,6 +59,11 @@
       color: var(--primary);
     }
 
+    nav ul li a.active {
+      background: var(--accent2);
+      color: var(--primary);
+    }
+
     .container {
       max-width: 1200px;
       margin: 0 auto;
@@ -268,6 +273,7 @@
         <li><a href="products.html">Products</a></li>
         <li><a href="about.html">About Us</a></li>
         <li><a href="search.html">Search</a></li>
+        <li><a href="contact.html">Contact</a></li>
         <li><a href="login.html">Login/Register</a></li>
       </ul>
     </nav>
@@ -369,5 +375,15 @@
         } else if (quantity > 1) {
           quantity--;
         }
-        quantitySpan.textContent = quantity
-    }}
+        quantitySpan.textContent = quantity;
+      });
+    });
+
+    document.querySelectorAll('.remove-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.closest('.cart-item').remove();
+      });
+    });
+  </script>
+</body>
+</html>
