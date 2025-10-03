@@ -1,3 +1,4 @@
+//server.js
 const express = require('express');
 const session = require('express-session');
 const mysql = require('mysql');
@@ -642,8 +643,6 @@ app.post('/api/contact', (req, res) => {
     }
   );
 });
-
-
 
 
 // Start server
