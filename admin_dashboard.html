@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard - Trisha's Dairy</title>
+  <style>
+    :root {
+      --primary: #e8eaed;
+      --secondary: #d1d5db;
+      --accent1: #6b7280;
+      --accent2: #4f46e5;
+      --text: #374151;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--secondary);
+      color: var(--text);
+    }
+
+    .top-bar {
+      width: 100%;
+      height: 70px;
+      background-color: var(--accent2);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .top-bar img {
+      height: 50px;
+    }
+
+    .container {
+      display: flex;
+      height: calc(100vh - 70px);
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      background-color: var(--accent1);
+      width: 270px;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--primary);
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+
+    .sidebar img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin-bottom: 20px;
+      border: 2px solid var(--accent2);
+      object-fit: cover;
+      background-color: #fff;
+    }
+
+    .sidebar .info p {
+      margin: 8px 0;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-align: center;
+      word-break: break-word;
+    }
+
+    .dashboard {
+      flex-grow: 1;
+      background-color: var(--primary);
+      padding: 40px 30px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dashboard h2 {
+      margin: 0 0 40px 0;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--accent2);
+      text-align: center;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 25px;
+      justify-items: center;
+    }
+
+    .buttons button {
+      width: 180px;
+      height: 70px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 12px;
+      border: 2px solid var(--accent2);
+      background-color: var(--primary);
+      color: var(--accent2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 6px rgba(79, 70, 229, 0.3);
+    }
+
+    .buttons button:hover {
+      background-color: var(--accent2);
+      color: var(--primary);
+      box-shadow: 0 6px 12px rgba(79, 70, 229, 0.6);
+      transform: translateY(-3px);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        height: auto;
+      }
+
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .dashboard {
+        padding: 20px;
+      }
+
+      .buttons {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px;
+      }
+
+      .buttons button {
+        width: 140px;
+        height: 60px;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <img src="logo.png" alt="Logo" />
+  </div>
+
+  <div class="container">
+    <div class="sidebar">
+      <img src="profile.png" alt="Admin Profile" />
+      <div class="info">
+        <p>Pettrisha</p>
+        <p>TFy36348@</p>
+        <p>pettrisha@gmail.com</p>
+        <p>88634872384</p>
+      </div>
+    </div>
+
+    <div class="dashboard">
+      <h2>Admin Dashboard</h2>
+      <div class="buttons">
+        <button>Sales Chart</button>
+        <button>Products List</button>
+        <button>Update Product</button>
+        <button>Ordered Items</button>
+        <button>Items Out for Delivery</button>
+        <button>Items Delivered</button>
+        <button>Feedbacks</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
