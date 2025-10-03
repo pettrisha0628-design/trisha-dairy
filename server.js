@@ -21,6 +21,7 @@ app.use(session({
 app.use(express.static('public'));
 
 // MySQL connection setup (change as per your setup)
+console.log('DB_HOST:', process.env.DB_HOST);
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
