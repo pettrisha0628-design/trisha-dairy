@@ -180,11 +180,12 @@ app.get(['/', '/index.html'], (req, res) => {
         <li><a href="about.html">About Us</a></li>
         <li><a href="search.html">Search</a></li>
         <li><a href="contact.html">Contact</a></li>
-        ${
+       ${
           user
-            ? `<li>Welcome, ${user} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
+            ? `<li><a href="/cart"><img src="cart.png" alt="Cart" style="height: 20px; vertical-align: middle;"> Cart</a></li><li>Welcome, ${user} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
             : `<li><a href="login.html">Login/Register</a></li>`
         }
+
       </ul>
     </nav>
   </header>
@@ -716,6 +717,23 @@ app.get('/cart', isAuthenticated, (req, res) => {
 </html>
     `);
   });
+});
+
+
+// Add to cart route
+app.post('/add-to-cart', isAuthenticated, (req, res) => {
+  const { product_id, qty } = req.body;
+  if (!req.session.cart) req.session.cart = [];
+  const index = req.session.cart.findIndex(item => item.product_id == product_id);
+  if (index !== -1) {
+    req.session.cart[index].qty += parseInt(qty);
+  } else {
+    req.session.cart.push({
+      product_id: parseInt(product_id),
+      qty: parseInt(qty)
+    });
+  }
+  res.send('Product has been added to cart! <a href="/cart">View Cart</a> | <a href="/products.html">Continue Shopping</a>');
 });
 
 
