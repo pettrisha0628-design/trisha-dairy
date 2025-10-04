@@ -860,7 +860,907 @@ app.post('/remove-from-cart', isAuthenticated, (req, res) => {
   res.redirect('/cart');
 });
 
+// search route with dynamic content
 
+app.get('/search.html', (req, res) => {
+  const user = req.session.user;
+
+  res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Products - Trisha's Dairy</title>
+  <style>
+    :root {
+      --primary: #e8eaed;
+      --secondary: #d1d5db;
+      --accent1: #6b7280;
+      --accent2: #4f46e5;
+      --text: #374151;
+      --shadow: rgba(107, 114, 128, 0.2);
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--primary);
+      color: var(--text);
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 40px;
+      background: var(--primary);
+      box-shadow: 0 2px 8px var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .logo img {
+      height: 60px;
+    }
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: 25px;
+    }
+    nav ul li a {
+      text-decoration: none;
+      font-weight: 600;
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    nav ul li a:hover {
+      background: var(--accent1);
+      color: var(--primary);
+    }
+    nav ul li a.active {
+      background: var(--accent2);
+      color: var(--primary);
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px;
+    }
+    .search-hero {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .search-hero h1 {
+      font-size: 2.5rem;
+      color: var(--accent2);
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+    .search-box {
+      display: flex;
+      max-width: 600px;
+      margin: 0 auto 40px;
+      box-shadow: 0 8px 24px var(--shadow);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .search-box input {
+      flex: 1;
+      padding: 20px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      background: var(--secondary);
+      color: var(--text);
+    }
+    .search-box button {
+      padding: 20px 30px;
+      background: var(--accent2);
+      color: var(--primary);
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .search-box button:hover {
+      background: #3b36d9;
+    }
+    .filters {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 12px 24px;
+      background: var(--secondary);
+      color: var(--text);
+      border: 2px solid var(--accent1);
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--accent2);
+      color: var(--primary);
+      border-color: var(--accent2);
+    }
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 30px;
+    }
+    .product-card {
+      background: var(--secondary);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 8px 24px var(--shadow);
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 40px rgba(79, 70, 229, 0.2);
+      border-color: var(--accent1);
+    }
+    .product-card img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 16px;
+      object-fit: contain;
+    }
+    .product-card h3 {
+      font-size: 1.3rem;
+      color: var(--accent2);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .product-card p {
+      color: var(--accent1);
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .product-card .btn {
+      background: var(--accent2);
+      color: var(--primary);
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .product-card .btn:hover {
+      background: #3b36d9;
+      transform: translateY(-2px);
+    }
+    .no-results {
+      text-align: center;
+      padding: 60px;
+      color: var(--accent1);
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="logo.png" alt="Trisha's Dairy Logo" />
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="search.html" class="active">Search</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        ${
+          user
+            ? `<li><a href="/cart"><img src="cart.png" style="height: 20px; vertical-align: middle;"> Cart</a></li>
+                <li>Welcome, ${user} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
+            : `<li><a href="login.html">Login/Register</a></li>`
+        }
+      </ul>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="search-hero">
+      <h1>Find Your Dairy Products</h1>
+      <div class="search-box">
+        <input type="text" placeholder="Search for milk, cheese, yogurt..." />
+        <button>Search</button>
+      </div>
+    </div>
+    <div class="filters">
+      <button class="filter-btn active">All Products</button>
+      <button class="filter-btn">Milk</button>
+      <button class="filter-btn">Cheese</button>
+      <button class="filter-btn">Yogurt</button>
+      <button class="filter-btn">Dairy Products</button>
+      <button class="filter-btn">Fresh Items</button>
+    </div>
+    <div class="results-grid">
+      <div class="product-card">
+        <img src="milk.png" alt="Fresh Milk" />
+        <h3>Fresh Milk</h3>
+        <p>Creamy fresh milk from healthy cows</p>
+        <p>₹ 20 / 500ml</p>
+        <p>In stock: 100</p>
+        <button class="btn">Add to Cart</button>
+      </div>
+      <div class="product-card">
+        <img src="curd.png" alt="Curd" />
+        <h3>Curd</h3>
+        <p>Thick and creamy homemade curd</p>
+        <p>₹ 34 / 500ml</p>
+        <p>In stock: 50</p>
+        <button class="btn">Add to Cart</button>
+      </div>
+      <div class="product-card">
+        <img src="cheese.png" alt="Cheese" />
+        <h3>Cheese</h3>
+        <p>Rich and smooth cheese block</p>
+        <p>₹ 60 / pack</p>
+        <p>In stock: 30</p>
+        <button class="btn">Add to Cart</button>
+      </div>
+      <div class="product-card">
+        <img src="yogurt.png" alt="Yogurt" />
+        <h3>Yogurt</h3>
+        <p>Delicious natural yogurt</p>
+        <p>₹ 40 / 500ml</p>
+        <p>In stock: 40</p>
+        <button class="btn">Add to Cart</button>
+      </div>
+      <div class="product-card">
+        <img src="paneer.png" alt="Paneer" />
+        <h3>Paneer</h3>
+        <p>Fresh cottage cheese</p>
+        <p>₹ 80 / pack</p>
+        <p>In stock: 25</p>
+        <button class="btn">Add to Cart</button>
+      </div>
+      <div class="product-card">
+        <img src="ghee.png" alt="Ghee" />
+        <h3>Ghee</h3>
+        <p>Pure clarified butter</p>
+        <p>₹ 100 / bottle</p>
+        <p>In stock: 20</p>
+        <button class="btn">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Simple search and filter functionality
+    const searchInput = document.querySelector('.search-box input');
+    const searchBtn = document.querySelector('.search-box button');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const productCards = document.querySelectorAll('.product-card');
+
+    // Filter functionality
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.textContent.toLowerCase();
+        productCards.forEach(card => {
+          const productName = card.querySelector('h3').textContent.toLowerCase();
+          if (filter === 'all products' || productName.includes(filter)) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Search functionality
+    function performSearch() {
+      const searchTerm = searchInput.value.toLowerCase();
+      productCards.forEach(card => {
+        const productName = card.querySelector('h3').textContent.toLowerCase();
+        if (productName.includes(searchTerm)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    searchBtn.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        performSearch();
+      }
+    });
+  </script>
+</body>
+</html>
+  `);
+});
+
+// about route with dynamic content.
+app.get('/about.html', (req, res) => {
+  const user = req.session.user;
+
+  res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us - Trisha's Dairy</title>
+   <style>
+    :root {
+      --primary: #e8eaed;
+      --secondary: #d1d5db;
+      --accent1: #6b7280;
+      --accent2: #4f46e5;
+      --text: #374151;
+      --shadow: rgba(107, 114, 128, 0.2);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--primary);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 40px;
+      background: var(--primary);
+      box-shadow: 0 2px 8px var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logo img {
+      height: 60px;
+    }
+
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: 25px;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      font-weight: 600;
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    nav ul li a:hover {
+      background: var(--accent1);
+      color: var(--primary);
+    }
+
+    nav ul li a.active {
+      background: var(--accent2);
+      color: var(--primary);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 40px;
+    }
+
+    .hero-section {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .hero-section h1 {
+      font-size: 3rem;
+      color: var(--accent2);
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .hero-section p {
+      font-size: 1.2rem;
+      color: var(--accent1);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 40px;
+      margin-top: 40px;
+    }
+
+    .content-card {
+      background: var(--secondary);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px var(--shadow);
+      transition: transform 0.3s ease;
+    }
+
+    .content-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .content-card h3 {
+      font-size: 1.8rem;
+      color: var(--accent2);
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .content-card p {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    .highlight {
+      background: var(--accent2);
+      color: var(--primary);
+      padding: 40px;
+      border-radius: 16px;
+      text-align: center;
+      margin: 60px 0;
+    }
+
+    .highlight h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .highlight p {
+      font-size: 1.3rem;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="logo.png" alt="Trisha's Dairy Logo" />
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="about.html" class="active">About Us</a></li>
+        <li><a href="search.html">Search</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        ${
+          user
+            ? `<li><a href="/cart"><img src="cart.png" style="height: 20px; vertical-align: middle;"> Cart</a></li>
+                <li>Welcome, ${user} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
+            : `<li><a href="login.html">Login/Register</a></li>`
+        }
+      </ul>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="hero-section">
+      <h1>About Trisha's Dairy</h1>
+      <p>Your trusted partner for fresh, hygienic, and high-quality dairy products</p>
+    </div>
+
+    <div class="content-grid">
+      <div class="content-card">
+        <h3>Our Story</h3>
+        <p>Trisha's Dairy is a corporate citizen who understands the enormous significance of hygienic milk and dairy products for agro and industrial development. Leveraging the strength of superior product offerings, Trisha's Dairy has strategized its foray into the consumer market, with the aim of being the market leader, earning respect and revenue for the stakeholders.</p>
+      </div>
+
+      <div class="content-card">
+        <h3>Our Mission</h3>
+        <p>Our mission is to become the premier retailer of high-quality food products in India. To achieve this goal, we are committed to passionately focusing on customer value, being intolerant of waste, and serving as responsible citizens in our communities.</p>
+      </div>
+
+      <div class="content-card">
+        <h3>Our Promise</h3>
+        <p>Our aim is to meet the diverse needs of consumers every day by marketing and selling foods that are consistent and of high quality. We ensure that every product that reaches your table meets the highest standards of freshness and purity.</p>
+      </div>
+
+      <div class="content-card">
+        <h3>Quality Assurance</h3>
+        <p>We maintain strict quality control measures throughout our supply chain, from farm to your family. Our state-of-the-art processing facilities and rigorous testing ensure that you receive only the best dairy products.</p>
+      </div>
+    </div>
+
+    <div class="highlight">
+      <h2>Fresh from Farm to Family</h2>
+      <p>Experience the pure taste of nature with Trisha's Dairy products</p>
+    </div>
+  </div>
+</body>
+</html>
+  `);
+});
+
+
+// contact route with dynamic content.
+
+app.get('/contact.html', (req, res) => {
+  const user = req.session.user;
+
+  res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us - Trisha's Dairy</title>
+  <style>
+    :root {
+      --primary: #e8eaed;
+      --secondary: #d1d5db;
+      --accent1: #6b7280;
+      --accent2: #4f46e5;
+      --text: #374151;
+      --shadow: rgba(107, 114, 128, 0.2);
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--primary);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 40px;
+      background: var(--primary);
+      box-shadow: 0 2px 8px var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .logo img {
+      height: 60px;
+    }
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: 25px;
+    }
+    nav ul li a {
+      text-decoration: none;
+      font-weight: 600;
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    nav ul li a:hover {
+      background: var(--accent1);
+      color: var(--primary);
+    }
+    nav ul li a.active {
+      background: var(--accent2);
+      color: var(--primary);
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 40px;
+    }
+    .contact-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .contact-header h1 {
+      font-size: 3rem;
+      color: var(--accent2);
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+    .contact-header p {
+      font-size: 1.2rem;
+      color: var(--accent1);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .contact-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      margin-bottom: 60px;
+    }
+    .contact-form {
+      background: var(--secondary);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px var(--shadow);
+    }
+    .contact-form h2 {
+      color: var(--accent2);
+      margin-bottom: 30px;
+      font-weight: 600;
+      font-size: 1.8rem;
+    }
+    .form-field {
+      margin-bottom: 25px;
+    }
+    .form-field label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .form-field input, .form-field select, .form-field textarea {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid var(--accent1);
+      border-radius: 8px;
+      background: var(--primary);
+      color: var(--text);
+      font-size: 16px;
+      transition: border-color 0.3s;
+      font-family: inherit;
+    }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+      outline: none;
+      border-color: var(--accent2);
+    }
+    .form-field textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--accent2);
+      color: var(--primary);
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .submit-btn:hover {
+      background: #3b36d9;
+      transform: translateY(-2px);
+    }
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    .info-card {
+      background: var(--secondary);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px var(--shadow);
+      transition: transform 0.3s;
+    }
+    .info-card:hover {
+      transform: translateY(-5px);
+    }
+    .info-card .icon {
+      width: 60px;
+      height: 60px;
+      background: var(--accent2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+    .info-card h3 {
+      color: var(--accent2);
+      margin-bottom: 15px;
+      font-weight: 600;
+      font-size: 1.3rem;
+    }
+    .info-card p {
+      margin: 5px 0;
+      color: var(--text);
+    }
+    .map-section {
+      background: var(--secondary);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px var(--shadow);
+      text-align: center;
+    }
+    .map-section h2 {
+      color: var(--accent2);
+      margin-bottom: 20px;
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+    .map-placeholder {
+      width: 100%;
+      height: 300px;
+      background: var(--accent1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    @media (max-width: 768px) {
+      .contact-content {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .container {
+        padding: 40px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="logo.png" alt="Trisha's Dairy Logo" />
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="search.html">Search</a></li>
+        <li><a href="contact.html" class="active">Contact</a></li>
+        ${
+          user
+            ? `<li><a href="/cart"><img src="cart.png" style="height: 20px; vertical-align: middle;"> Cart</a></li>
+                <li>Welcome, ${user} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
+            : `<li><a href="login.html">Login/Register</a></li>`
+        }
+      </ul>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="contact-header">
+      <h1>Get in Touch</h1>
+      <p>We'd love to hear from you! Reach out to us for any questions about our fresh dairy products or services.</p>
+    </div>
+
+    <div class="contact-content">
+      <div class="contact-form">
+        <h2>📧 Send us a Message</h2>
+        <form>
+          <div class="form-field">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" required />
+          </div>
+
+          <div class="form-field">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" required />
+          </div>
+
+          <div class="form-field">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" />
+          </div>
+
+          <div class="form-field">
+            <label for="subject">Subject</label>
+            <select id="subject" required>
+              <option value="">Select a topic</option>
+              <option value="general">General Inquiry</option>
+              <option value="order">Order Support</option>
+              <option value="quality">Product Quality</option>
+              <option value="delivery">Delivery Issues</option>
+              <option value="partnership">Business Partnership</option>
+              <option value="feedback">Feedback</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="message">Message</label>
+            <textarea id="message" placeholder="Tell us how we can help you..." required></textarea>
+          </div>
+
+          <button type="submit" class="submit-btn">Send Message</button>
+        </form>
+      </div>
+
+      <div class="contact-info">
+        <div class="info-card">
+          <div class="icon">📍</div>
+          <h3>Visit Our Store</h3>
+          <p>123 Dairy Lane</p>
+          <p>Fresh Valley, MH 400001</p>
+          <p>Bangaluru, India</p>
+        </div>
+
+        <div class="info-card">
+          <div class="icon">📞</div>
+          <h3>Call Us</h3>
+          <p>Customer Service: +91 98765 43210</p>
+          <p>Order Support: +91 98765 43211</p>
+          <p>Mon-Sat: 7:00 AM - 9:00 PM</p>
+        </div>
+
+        <div class="info-card">
+          <div class="icon">✉️</div>
+          <h3>Email Us</h3>
+          <p>orders@trishasdairy.com</p>
+          <p>support@trishasdairy.com</p>
+          <p>info@trishasdairy.com</p>
+        </div>
+
+        <div class="info-card">
+          <div class="icon">⏰</div>
+          <h3>Business Hours</h3>
+          <p>Monday - Saturday: 6:00 AM - 10:00 PM</p>
+          <p>Sunday: 7:00 AM - 8:00 PM</p>
+          <p>Delivery: Daily 6:00 AM - 6:00 PM</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="map-section">
+      <h2>📍 Find Us</h2>
+      <div class="map-placeholder">
+        🗺️ Interactive Map Coming Soon
+      </div>
+    </div>
+  </div>
+
+  <script>
+  document.querySelector('.contact-form form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const subject = document.getElementById('subject').value;
+    const message = document.getElementById('message').value;
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, subject, message })
+      });
+      const result = await response.json();
+      if (response.ok) {
+        alert(result.message);
+        this.reset();
+      } else {
+        alert(result.error || 'Failed to submit the form.');
+      }
+    } catch (error) {
+      alert('Error submitting form. Please try again.');
+      console.error(error);
+    }
+  });
+</script>
+</body>
+</html>
+  `);
+});
 
 
 
