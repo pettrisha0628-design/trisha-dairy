@@ -492,6 +492,263 @@ app.post('/api/contact', (req, res) => {
   );
 });
 
+// Dynamic Cart Route - Your Design with Session Data
+app.get('/cart', isAuthenticated, (req, res) => {
+  const cart = req.session.cart || [];
+  const currentUser = req.session.user;
+
+  if (cart.length === 0) {
+    // Empty cart HTML
+    return res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shopping Cart - Trisha's Dairy</title>
+  <style>
+    :root {
+      --primary: #e8eaed;
+      --secondary: #d1d5db;
+      --accent1: #6b7280;
+      --accent2: #4f46e5;
+      --text: #374151;
+      --shadow: rgba(107, 114, 128, 0.2);
+    }
+    body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--primary); color: var(--text); }
+    header { display: flex; align-items: center; justify-content: space-between; padding: 10px 40px; background: var(--primary); box-shadow: 0 2px 8px var(--shadow); position: sticky; top: 0; z-index: 1000; }
+    .logo img { height: 60px; }
+    nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 25px; }
+    nav ul li a { text-decoration: none; font-weight: 600; color: var(--text); padding: 8px 16px; border-radius: 8px; transition: all 0.3s; }
+    nav ul li a:hover { background: var(--accent1); color: var(--primary); }
+    nav ul li a.active { background: var(--accent2); color: var(--primary); }
+    .empty-cart { text-align: center; padding: 60px; color: var(--accent1); }
+    .empty-cart h2 { color: var(--accent2); margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="logo.png" alt="Trisha's Dairy Logo" />
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="search.html">Search</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="/cart" class="active">Cart</a></li>
+        <li>Welcome, ${currentUser} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+  <div class="empty-cart">
+    <h2>Your Cart is Empty</h2>
+    <p>Add some delicious dairy products to get started!</p>
+    <a href="/products.html">← Continue Shopping</a>
+  </div>
+</body>
+</html>
+    `);
+  }
+
+  // Fetch product details for cart items
+  const productIds = cart.map(item => item.product_id);
+  db.query('SELECT * FROM products WHERE product_id IN (?)', [productIds], (err, products) => {
+    if (err) {
+      return res.status(500).send('Database error loading cart.');
+    }
+
+    // Generate cart items HTML
+    let cartItemsHtml = '';
+    let subtotal = 0;
+
+    cart.forEach(cartItem => {
+      const product = products.find(p => p.product_id === cartItem.product_id);
+      if (product) {
+        const itemTotal = product.price * cartItem.qty;
+        subtotal += itemTotal;
+        
+        cartItemsHtml += `
+        <div class="cart-item">
+          <img src="${product.image_url}" alt="${product.product_name}" />
+          <div class="item-details">
+            <h3>${product.product_name}</h3>
+            <p>${product.description}</p>
+          </div>
+          <div class="quantity-controls">
+            <form method="POST" action="/update-cart" style="display: inline;">
+              <input type="hidden" name="product_id" value="${product.product_id}">
+              <input type="hidden" name="action" value="decrease">
+              <button type="submit" class="quantity-btn">-</button>
+            </form>
+            <span class="quantity">${cartItem.qty}</span>
+            <form method="POST" action="/update-cart" style="display: inline;">
+              <input type="hidden" name="product_id" value="${product.product_id}">
+              <input type="hidden" name="action" value="increase">
+              <button type="submit" class="quantity-btn">+</button>
+            </form>
+          </div>
+          <div class="item-price">₹${itemTotal}</div>
+          <form method="POST" action="/remove-from-cart" style="display: inline;">
+            <input type="hidden" name="product_id" value="${product.product_id}">
+            <button type="submit" class="remove-btn">Remove</button>
+          </form>
+        </div>
+        `;
+      }
+    });
+
+    const deliveryFee = 25;
+    const discount = subtotal > 100 ? 10 : 0;
+    const total = subtotal + deliveryFee - discount;
+
+    // Send full cart page with your exact design
+    res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shopping Cart - Trisha's Dairy</title>
+  <style>
+    :root {
+      --primary: #e8eaed;
+      --secondary: #d1d5db;
+      --accent1: #6b7280;
+      --accent2: #4f46e5;
+      --text: #374151;
+      --shadow: rgba(107, 114, 128, 0.2);
+    }
+    body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--primary); color: var(--text); }
+    header { display: flex; align-items: center; justify-content: space-between; padding: 10px 40px; background: var(--primary); box-shadow: 0 2px 8px var(--shadow); position: sticky; top: 0; z-index: 1000; }
+    .logo img { height: 60px; }
+    nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 25px; }
+    nav ul li a { text-decoration: none; font-weight: 600; color: var(--text); padding: 8px 16px; border-radius: 8px; transition: all 0.3s; }
+    nav ul li a:hover { background: var(--accent1); color: var(--primary); }
+    nav ul li a.active { background: var(--accent2); color: var(--primary); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 40px; }
+    .cart-header { text-align: center; margin-bottom: 40px; }
+    .cart-header h1 { font-size: 2.5rem; color: var(--accent2); margin-bottom: 10px; font-weight: 700; }
+    .cart-content { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; }
+    .cart-items { background: var(--secondary); border-radius: 16px; padding: 30px; box-shadow: 0 8px 24px var(--shadow); }
+    .cart-item { display: flex; align-items: center; padding: 20px; background: var(--primary); border-radius: 12px; margin-bottom: 20px; transition: transform 0.2s; }
+    .cart-item:hover { transform: translateX(5px); }
+    .cart-item img { width: 80px; height: 80px; border-radius: 8px; margin-right: 20px; }
+    .item-details { flex: 1; }
+    .item-details h3 { margin: 0 0 5px 0; color: var(--accent2); font-weight: 600; }
+    .item-details p { margin: 0; color: var(--accent1); }
+    .quantity-controls { display: flex; align-items: center; gap: 10px; margin: 0 20px; }
+    .quantity-btn { width: 35px; height: 35px; border: none; background: var(--accent2); color: var(--primary); border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .quantity-btn:hover { background: #3b36d9; }
+    .quantity { font-weight: 600; font-size: 18px; }
+    .item-price { font-weight: 700; font-size: 18px; color: var(--accent2); margin: 0 20px; }
+    .remove-btn { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    .remove-btn:hover { background: #dc2626; }
+    .cart-summary { background: var(--secondary); border-radius: 16px; padding: 30px; box-shadow: 0 8px 24px var(--shadow); height: fit-content; }
+    .cart-summary h2 { color: var(--accent2); margin-bottom: 25px; font-weight: 700; }
+    .summary-line { display: flex; justify-content: space-between; margin-bottom: 15px; padding: 10px 0; }
+    .summary-line.total { border-top: 2px solid var(--accent1); padding-top: 20px; font-weight: 700; font-size: 1.2rem; color: var(--accent2); }
+    .checkout-btn { width: 100%; padding: 16px; background: var(--accent2); color: var(--primary); border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 20px; transition: all 0.3s; }
+    .checkout-btn:hover { background: #3b36d9; transform: translateY(-2px); }
+    .continue-shopping { text-align: center; margin-top: 20px; }
+    .continue-shopping a { color: var(--accent2); text-decoration: none; font-weight: 600; }
+    @media (max-width: 768px) { .cart-content { grid-template-columns: 1fr; } .cart-item { flex-direction: column; text-align: center; gap: 15px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="logo.png" alt="Trisha's Dairy Logo" />
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="search.html">Search</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="/cart" class="active">Cart</a></li>
+        <li>Welcome, ${currentUser} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="cart-header">
+      <h1>Your Shopping Cart</h1>
+    </div>
+
+    <div class="cart-content">
+      <div class="cart-items">
+        ${cartItemsHtml}
+      </div>
+
+      <div class="cart-summary">
+        <h2>Order Summary</h2>
+        <div class="summary-line">
+          <span>Subtotal:</span>
+          <span>₹${subtotal}</span>
+        </div>
+        <div class="summary-line">
+          <span>Delivery Fee:</span>
+          <span>₹${deliveryFee}</span>
+        </div>
+        <div class="summary-line">
+          <span>Discount:</span>
+          <span>-₹${discount}</span>
+        </div>
+        <div class="summary-line total">
+          <span>Total:</span>
+          <span>₹${total}</span>
+        </div>
+        <form action="/checkout" method="POST">
+          <button type="submit" class="checkout-btn">Proceed to Checkout</button>
+        </form>
+        <div class="continue-shopping">
+          <a href="products.html">← Continue Shopping</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+    `);
+  });
+});
+
+
+// POST /update-cart
+app.post('/update-cart', isAuthenticated, (req, res) => {
+  const { product_id, action } = req.body;
+  if (!req.session.cart) req.session.cart = [];
+  const index = req.session.cart.findIndex(item => item.product_id == product_id);
+  if (index !== -1) {
+    if (action === 'increase') {
+      req.session.cart[index].qty += 1;
+    } else if (action === 'decrease') {
+      // Only decrease if quantity > 1
+      if (req.session.cart[index].qty > 1) {
+        req.session.cart[index].qty -= 1;
+      }
+    }
+  }
+  res.redirect('/cart');
+});
+
+
+// POST /remove-from-cart
+app.post('/remove-from-cart', isAuthenticated, (req, res) => {
+  const { product_id } = req.body;
+  if (!req.session.cart) req.session.cart = [];
+  req.session.cart = req.session.cart.filter(item => item.product_id != product_id);
+  res.redirect('/cart');
+});
+
+
+
+
 
 // Start server
 app.listen(3000, () => {
