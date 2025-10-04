@@ -800,9 +800,7 @@ app.get('/cart', isAuthenticated, (req, res) => {
           <span>Total:</span>
           <span>₹${total}</span>
         </div>
-        <form action="/checkout" method="POST">
-          <button type="submit" class="checkout-btn">Proceed to Checkout</button>
-        </form>
+        <button type="button" class="checkout-btn" onclick="window.location.href='/checkout'">Proceed to Checkout</button>
         <div class="continue-shopping">
           <a href="products.html">← Continue Shopping</a>
         </div>
@@ -2123,7 +2121,6 @@ app.post('/checkout', isAuthenticated, (req, res) => {
   console.error('Error placing order:', err);
   return res.send('Error placing order.<br>' + err.message);
 }
-
       res.redirect('/dashboard');
     }
   );
