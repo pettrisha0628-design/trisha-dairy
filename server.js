@@ -286,6 +286,102 @@ app.post('/login', (req, res) => {
     });
   });
 });
+
+//products route with dynamic product cards
+app.get('/products.html', (req, res) => {
+  const user = req.session.user;
+
+  db.query('SELECT * FROM products', (err, products) => {
+    if (err) return res.send('Error loading products.');
+
+    // Build HTML cards for each product
+    const productCards = products.map(product => `
+      <div class="product-card">
+        <img src="${product.image_url || 'default-product.png'}" alt="${product.product_name}" />
+        <h3>${product.product_name}</h3>
+        <p>${product.description}</p>
+        <p>₹ ${product.price}</p>
+        <p>In stock: ${product.stock}</p>
+        <form method="POST" action="/add-to-cart" style="display:inline;">
+          <input type="hidden" name="product_id" value="${product.product_id}" />
+          <input type="hidden" name="qty" value="1" />
+          <button class="cart-btn" type="submit">Add to Cart</button>
+        </form>
+        <button class="buy-btn" onclick="alert('Proceeding to order or checkout!')">Order</button>
+      </div>
+    `).join('');
+
+    res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dairy Products - Products</title>
+  <style>
+    /* Your existing CSS */
+    :root{
+      --primary: #e8eaed;
+      --secondary: #d1d5db;
+      --accent1: #6b7280;
+      --accent2: #4f46e5;
+      --text: #374151;
+      --shadow: rgba(107, 114, 128, 0.2);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+      color: var(--text);
+    }
+    header{display:flex;align-items:center;justify-content:space-between; padding:10px 40px;background:var(--primary); box-shadow:0 2px 8px var(--shadow); position:sticky;top:0;z-index:1000;}
+    .logo img{height:60px}
+    nav ul{list-style:none;margin:0;padding:0;display:flex;gap:25px}
+    nav a{text-decoration:none;font-weight:600;color:var(--text);transition:all .3s; padding:8px 16px;border-radius:8px;}
+    nav a:hover{background:var(--accent1); color:var(--primary);}
+    nav a.active{background:var(--accent2); color:var(--primary); box-shadow:0 2px 6px var(--shadow);}
+    .products{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:30px;padding:50px 40px;}
+    .product-card{background:var(--primary);border-radius:16px;text-align:center; padding:30px 24px;box-shadow:0 8px 24px var(--shadow); transition:all .3s ease;border:1px solid var(--secondary);}
+    .product-card:hover{transform:translateY(-8px); box-shadow:0 16px 40px rgba(79, 70, 229, 0.2); border-color:var(--accent1);}
+    .product-card img{height:120px;margin-bottom:20px}
+    .product-card h3{margin:0 0 8px 0;font-size:22px;color:var(--accent2);font-weight:700;}
+    .product-card p{font-size:18px;margin:0 0 20px 0;font-weight:600;color:var(--accent1);}
+    .cart-btn,.buy-btn{margin:6px;padding:12px 20px;border:none;border-radius:8px; font-size:16px;font-weight:600;cursor:pointer;transition:all .3s; min-width:100px;}
+    .cart-btn{background:var(--secondary); color:var(--accent1); border:2px solid var(--accent1);}
+    .cart-btn:hover{background:var(--accent1); color:var(--primary);}
+    .buy-btn{background:var(--accent2); color:var(--primary);}
+    .buy-btn:hover{background:#3b36d9; transform:translateY(-2px);}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo"><img src="logo.png" alt="Dairy Logo"></div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html" class="active">Products</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="search.html">Search</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        ${
+          user
+            ? `<li><a href="/cart"><img src="cart.png" style="height: 20px; vertical-align: middle;"> Cart</a></li>
+                <li>Welcome, ${user} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
+            : `<li><a href="login.html">Login/Register</a></li>`
+        }
+      </ul>
+    </nav>
+  </header>
+  <section class="products">
+    ${productCards}
+  </section>
+</body>
+</html>
+    `);
+  });
+});
+
+
 //user dashboard route.
 
 app.get('/dashboard', isAuthenticated, (req, res) => {
