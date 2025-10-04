@@ -1763,6 +1763,372 @@ app.get('/contact.html', (req, res) => {
 });
 
 
+// GET: Show checkout page, login-aware nav
+app.get('/checkout', (req, res) => {
+  const user = req.session.user;
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Checkout - Trisha's Dairy</title>
+      <style>
+    :root {
+      --primary: #e8eaed;
+      --secondary: #d1d5db;
+      --accent1: #6b7280;
+      --accent2: #4f46e5;
+      --text: #374151;
+      --shadow: rgba(107, 114, 128, 0.2);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--primary);
+      color: var(--text);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 40px;
+      background: var(--primary);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .logo img {
+      height: 60px;
+    }
+
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: 25px;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      font-weight: 600;
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    nav ul li a:hover {
+      background: var(--accent1);
+      color: var(--primary);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px;
+    }
+
+    .checkout-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .checkout-header h1 {
+      font-size: 2.5rem;
+      color: var(--accent2);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .checkout-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 40px;
+    }
+
+    .checkout-form {
+      background: var(--secondary);
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+
+    .form-section {
+      margin-bottom: 40px;
+    }
+
+    .form-section h2 {
+      color: var(--accent2);
+      margin-bottom: 20px;
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .form-field {
+      margin-bottom: 20px;
+    }
+
+    .form-field.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-field label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .form-field input, .form-field select, .form-field textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid var(--accent1);
+      border-radius: 8px;
+      background: var(--primary);
+      color: var(--text);
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+      outline: none;
+      border-color: var(--accent2);
+    }
+
+    .payment-methods {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 15px;
+    }
+
+    .payment-option {
+      padding: 15px;
+      border: 2px solid var(--accent1);
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: var(--primary);
+    }
+
+    .payment-option:hover, .payment-option.selected {
+      border-color: var(--accent2);
+      background: var(--accent2);
+      color: var(--primary);
+    }
+
+    .order-summary {
+      background: var(--secondary);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 8px 24px var(--shadow);
+      height: fit-content;
+    }
+
+    .order-summary h2 {
+      color: var(--accent2);
+      margin-bottom: 25px;
+      font-weight: 700;
+    }
+
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid var(--accent1);
+    }
+
+    .order-item:last-child {
+      border-bottom: none;
+    }
+
+    .item-info h4 {
+      margin: 0 0 5px 0;
+      color: var(--text);
+    }
+
+    .item-info p {
+      margin: 0;
+      color: var(--accent1);
+      font-size: 14px;
+    }
+
+    .summary-totals {
+      margin-top: 25px;
+      padding-top: 25px;
+      border-top: 2px solid var(--accent1);
+    }
+
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .summary-line.total {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--accent2);
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid var(--accent1);
+    }
+
+    .place-order-btn {
+      width: 100%;
+      padding: 18px;
+      background: var(--accent2);
+      color: var(--primary);
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 25px;
+      transition: all 0.3s;
+    }
+
+    .place-order-btn:hover {
+      background: #3b36d9;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .checkout-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+    </head>
+    <body>
+      <header>
+        <div class="logo">
+          <img src="logo.png" alt="Trisha's Dairy Logo" />
+        </div>
+        <nav>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="products.html">Products</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="search.html">Search</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            ${
+              user
+                ? `<li><a href="/cart"><img src="cart.png" style="height: 20px; vertical-align: middle;"> Cart</a></li>
+                    <li>Welcome, ${user} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
+                : `<li><a href="login.html">Login/Register</a></li>`
+            }
+          </ul>
+        </nav>
+      </header>
+      <div class="container">
+        <div class="checkout-header">
+          <h1>Checkout</h1>
+        </div>
+        <div class="checkout-content">
+          <div class="checkout-form">
+            <form method="POST" action="/checkout">
+              <div class="form-section">
+                <h2>🚚 Delivery Information</h2>
+                <div class="form-grid">
+                  <div class="form-field">
+                    <label for="firstName">First Name</label>
+                    <input type="text" name="firstName" id="firstName" required />
+                  </div>
+                  <div class="form-field">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" name="lastName" id="lastName" required />
+                  </div>
+                  <div class="form-field full-width">
+                    <label for="address">Street Address</label>
+                    <input type="text" name="address" id="address" required />
+                  </div>
+                  <div class="form-field">
+                    <label for="city">City</label>
+                    <input type="text" name="city" id="city" required />
+                  </div>
+                  <div class="form-field">
+                    <label for="pincode">Pin Code</label>
+                    <input type="text" name="pincode" id="pincode" required />
+                  </div>
+                  <div class="form-field full-width">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" name="phone" id="phone" required />
+                  </div>
+                </div>
+              </div>
+              <div class="form-section">
+                <h2>💳 Payment Method</h2>
+                <div class="payment-methods">
+                  <div class="payment-option selected">
+                    <strong>💰</strong><br>Cash on Delivery (COD)
+                  </div>
+                </div>
+                <input type="hidden" name="payment_method" value="COD" />
+              </div>
+              <div class="form-section">
+                <h2>📝 Special Instructions</h2>
+                <div class="form-field">
+                  <textarea name="instructions" rows="3" placeholder="Any special delivery instructions..."></textarea>
+                </div>
+              </div>
+              <button type="submit" class="place-order-btn">Place Order</button>
+            </form>
+          </div>
+          <div class="order-summary">
+            <h2>Order Summary</h2>
+            <!-- Show summary dynamically? For now just a demo -->
+            <div class="order-item">
+              <div class="item-info"><h4>Product Name (Qty)</h4><p>Product details</p></div>
+              <span>₹0</span>
+            </div>
+            <div class="summary-totals">
+              <div class="summary-line"><span>Subtotal:</span><span>₹0</span></div>
+              <div class="summary-line"><span>Delivery Fee:</span><span>₹0</span></div>
+              <div class="summary-line total"><span>Total:</span><span>₹0</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
+// POST: Place new order, store for admin and user
+app.post('/checkout', isAuthenticated, (req, res) => {
+  const user = req.session.user;
+  const { firstName, lastName, address, city, pincode, phone, payment_method, instructions } = req.body;
+
+  db.query(
+    `INSERT INTO orders (user_id, delivery_name, delivery_address, city, pincode, phone, instructions, payment_method, order_date, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)`,
+    [user, `${firstName} ${lastName}`, address, city, pincode, phone, instructions, payment_method, 'Processing'],
+    (err) => {
+      if (err) {
+        console.error('Error placing order:', err);
+        return res.send('Error placing order.');
+      }
+      res.redirect('/dashboard');
+    }
+  );
+});
+
+
 
 // Start server
 app.listen(3000, () => {
