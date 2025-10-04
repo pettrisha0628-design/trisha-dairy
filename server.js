@@ -2120,9 +2120,10 @@ app.post('/checkout', isAuthenticated, (req, res) => {
     [user, `${firstName} ${lastName}`, address, city, pincode, phone, instructions, payment_method, 'Processing'],
     (err) => {
       if (err) {
-        console.error('Error placing order:', err);
-        return res.send('Error placing order.');
-      }
+  console.error('Error placing order:', err);
+  return res.send('Error placing order.<br>' + err.message);
+}
+
       res.redirect('/dashboard');
     }
   );
