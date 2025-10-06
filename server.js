@@ -1760,10 +1760,28 @@ app.get('/contact.html', (req, res) => {
   `);
 });
 
-
-// GET: Show checkout page, login-aware nav
+//get checkout route with dynamic content.
 app.get('/checkout', (req, res) => {
   const user = req.session.user;
+  const cart = req.session.cart || [];
+
+  // Build the order summary HTML
+  let orderSummaryHtml = '';
+  if (cart.length === 0) {
+    orderSummaryHtml = '<p>Your cart is empty.</p>';
+  } else {
+    cart.forEach(item => {
+      orderSummaryHtml += `
+        <div class="order-item">
+          <div class="item-info">
+            <h4>${item.productname} x ${item.qty}</h4>
+            <p>Price: ₹${item.price} | Subtotal: ₹${item.price * item.qty}</p>
+          </div>
+        </div>
+      `;
+    });
+  }
+
   res.send(`
     <!DOCTYPE html>
     <html lang="en">
@@ -1771,7 +1789,7 @@ app.get('/checkout', (req, res) => {
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Checkout - Trisha's Dairy</title>
-      <style>
+       <style>
     :root {
       --primary: #e8eaed;
       --secondary: #d1d5db;
@@ -2027,7 +2045,7 @@ app.get('/checkout', (req, res) => {
             ${
               user
                 ? `<li><a href="/cart"><img src="cart.png" style="height: 20px; vertical-align: middle;"> Cart</a></li>
-                    <li>Welcome, ${user} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
+                  <li>Welcome, ${user} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
                 : `<li><a href="login.html">Login/Register</a></li>`
             }
           </ul>
@@ -2089,16 +2107,7 @@ app.get('/checkout', (req, res) => {
           </div>
           <div class="order-summary">
             <h2>Order Summary</h2>
-            <!-- Show summary dynamically? For now just a demo -->
-            <div class="order-item">
-              <div class="item-info"><h4>Product Name (Qty)</h4><p>Product details</p></div>
-              <span>₹0</span>
-            </div>
-            <div class="summary-totals">
-              <div class="summary-line"><span>Subtotal:</span><span>₹0</span></div>
-              <div class="summary-line"><span>Delivery Fee:</span><span>₹0</span></div>
-              <div class="summary-line total"><span>Total:</span><span>₹0</span></div>
-            </div>
+            ${orderSummaryHtml}
           </div>
         </div>
       </div>
@@ -2107,24 +2116,39 @@ app.get('/checkout', (req, res) => {
   `);
 });
 
+
 // POST: Place new order, store for admin and user
-app.post('/checkout', isAuthenticated, (req, res) => {
+app.post('/checkout', (req, res) => {
   const user = req.session.user;
   const { firstName, lastName, address, city, pincode, phone, payment_method, instructions } = req.body;
+  const cart = req.session.cart || [];
 
   db.query(
     `INSERT INTO orders (user_id, delivery_name, delivery_address, city, pincode, phone, instructions, payment_method, order_date, status)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)`,
     [user, `${firstName} ${lastName}`, address, city, pincode, phone, instructions, payment_method, 'Processing'],
-    (err) => {
+    (err, result) => {
       if (err) {
-  console.error('Error placing order:', err);
-  return res.send('Error placing order.<br>' + err.message);
-}
-      res.redirect('/dashboard');
+        console.error('Error placing order:', err);
+        return res.send('Error placing order.<br>' + err.message);
+      }
+
+      // --- NEW CODE: Insert each product from cart into order_items ---
+      const orderId = result.insertId; // Gets the order's ID
+      cart.forEach(item => {
+        db.query(
+          "INSERT INTO order_items (order_id, product_id, qty, price) VALUES (?, ?, ?, ?)",
+          [orderId, item.productid, item.qty, item.price]
+        );
+      });
+
+      req.session.cart = []; // Clear the cart
+
+      res.redirect('/dashboard'); // Success, go to dashboard
     }
   );
 });
+
 
 
 
