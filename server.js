@@ -815,8 +815,8 @@ app.get('/cart', isAuthenticated, (req, res) => {
 
 // post add to cart route.
 app.post('/add-to-cart', isAuthenticated, (req, res) => {
-  const { productid, qty } = req.body;
-  db.query('SELECT * FROM products WHERE productid = ?', [productid], (err, results) => {
+  const { product_id, qty } = req.body;
+  db.query('SELECT * FROM products WHERE product_id = ?', [product_id], (err, results) => {
     if (err || results.length === 0) {
       return res.send('Product not found!');
     }
@@ -829,8 +829,8 @@ app.post('/add-to-cart', isAuthenticated, (req, res) => {
       req.session.cart[index].qty += parseInt(qty);
     } else {
       req.session.cart.push({
-        productid: product.productid,
-        productname: product.productname,    // ensure this line exists
+        product_id: product.product_id,
+        product_name: product.product_name,    // ensure this line exists
         price: product.price,                // ensure this line exists
         qty: parseInt(qty)
       });
@@ -1784,7 +1784,7 @@ app.get('/checkout', (req, res) => {
       orderSummaryHtml += `
         <div class="order-item">
           <div class="item-info">
-            <h4>${item.productname} x ${item.qty}</h4>
+            <h4>${item.product_name} x ${item.qty}</h4>
             <p>Price: ₹${item.price} | Subtotal: ₹${item.price * item.qty}</p>
           </div>
         </div>
@@ -2148,7 +2148,7 @@ app.post('/checkout', (req, res) => {
       cart.forEach(item => {
         db.query(
           "INSERT INTO order_items (order_id, product_id, qty, price) VALUES (?, ?, ?, ?)",
-          [orderId, item.productid, item.qty, item.price]
+          [orderId, item.product_id, item.qty, item.price]
         );
       });
 
