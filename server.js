@@ -813,22 +813,32 @@ app.get('/cart', isAuthenticated, (req, res) => {
   });
 });
 
-
-// Add to cart route
+// post add to cart route.
 app.post('/add-to-cart', isAuthenticated, (req, res) => {
-  const { product_id, qty } = req.body;
-  if (!req.session.cart) req.session.cart = [];
-  const index = req.session.cart.findIndex(item => item.product_id == product_id);
-  if (index !== -1) {
-    req.session.cart[index].qty += parseInt(qty);
-  } else {
-    req.session.cart.push({
-      product_id: parseInt(product_id),
-      qty: parseInt(qty)
-    });
-  }
-  res.send('Product has been added to cart! <a href="/cart">View Cart</a> | <a href="/products.html">Continue Shopping</a>');
+  const { productid, qty } = req.body;
+  db.query('SELECT * FROM products WHERE productid = ?', [productid], (err, results) => {
+    if (err || results.length === 0) {
+      return res.send('Product not found!');
+    }
+    const product = results[0];
+
+    if (!req.session.cart) req.session.cart = [];
+
+    const index = req.session.cart.findIndex(item => item.productid == productid);
+    if (index !== -1) {
+      req.session.cart[index].qty += parseInt(qty);
+    } else {
+      req.session.cart.push({
+        productid: product.productid,
+        productname: product.productname,    // ensure this line exists
+        price: product.price,                // ensure this line exists
+        qty: parseInt(qty)
+      });
+    }
+    res.redirect('/cart');
+  });
 });
+
 
 
 // POST /update-cart
