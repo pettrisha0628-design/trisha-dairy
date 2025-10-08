@@ -294,22 +294,23 @@ app.get('/products.html', (req, res) => {
   db.query('SELECT * FROM products', (err, products) => {
     if (err) return res.send('Error loading products.');
 
-    // Build HTML cards for each product
-    const productCards = products.map(product => `
-      <div class="product-card">
-        <img src="${product.image_url || 'default-product.png'}" alt="${product.product_name}" />
-        <h3>${product.product_name}</h3>
-        <p>${product.description}</p>
-        <p>₹ ${product.price}</p>
-        <p>In stock: ${product.stock}</p>
-        <form method="POST" action="/add-to-cart" style="display:inline;">
-          <input type="hidden" name="product_id" value="${product.product_id}" />
-          <input type="hidden" name="qty" value="1" />
-          <button class="cart-btn" type="submit">Add to Cart</button>
-        </form>
-        <button class="buy-btn" onclick="alert('Proceeding to order or checkout!')">Order</button>
-      </div>
-    `).join('');
+
+// build product cards html 
+   const productCards = products.map(product => `
+  <div class="product-card">
+    <img src="${product.image_url || 'default-product.png'}" alt="${product.product_name}" />
+    <h3>${product.product_name}</h3>
+    <p>${product.description}</p>
+    <p>₹ ${product.price}</p>
+    <p>In stock: ${product.stock}</p>
+    <form method="POST" action="/buy-now" style="display:inline;">
+      <input type="hidden" name="product_id" value="${product.product_id}" />
+      <input type="hidden" name="qty" value="1" />
+      <button class="buy-btn" type="submit">Order</button>
+    </form>
+  </div>
+`).join('');
+
 
     res.send(`
 <!DOCTYPE html>
@@ -386,29 +387,40 @@ app.get('/products.html', (req, res) => {
 
 app.get('/dashboard', isAuthenticated, (req, res) => {
   const currentUser = req.session.user;
+
   db.query('SELECT * FROM users WHERE user_name = ?', [currentUser], (err, userResults) => {
     if (err) return res.status(500).send('Database error');
     if (userResults.length === 0) return res.status(404).send('User not found');
     const user = userResults[0];
 
-    // Fetch orders for this user (replace 'orders' as per your DB schema)
-    db.query('SELECT * FROM orders WHERE user_id = ?', [user.id], (err, orderResults) => {
+    // Main JOIN query for orders + products
+    db.query(`
+      SELECT o.*, 
+        GROUP_CONCAT(CONCAT(oi.qty, 'x ', p.product_name, ' (₹', oi.price, ')') SEPARATOR ', ') AS products
+      FROM orders o
+      JOIN order_items oi ON o.order_id = oi.order_id
+      JOIN products p ON oi.product_id = p.product_id
+      WHERE o.user_id = ?
+      GROUP BY o.order_id
+      ORDER BY o.order_date DESC
+      LIMIT 10
+    `, [user.id], (err, orderResults) => {
       if (err) return res.status(500).send('Database error (orders)');
 
-      // Dashboard stats
+      // Stats
       const totalOrders = orderResults.length;
       const pendingOrders = orderResults.filter(o => o.status === 'Processing').length;
-      const totalSpent = orderResults.reduce((sum, o) => sum + Number(o.total_amount), 0);
-      const rating = user.rating || '5★'; // or any default
+      const totalSpent = orderResults.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
+      const rating = user.rating || '5★';
 
-      // Orders HTML
+      // Orders list HTML
       let ordersHtml = '';
       orderResults.forEach(order => {
         ordersHtml += `
           <div class="order-item">
             <div class="order-info">
               <h4>Order #${order.order_id}</h4>
-              <p>${order.description || ''}</p>
+              <p><b>Products:</b> ${order.products}</p>
               <p>Placed on ${order.order_date}</p>
             </div>
             <div class="order-status status-${order.status.toLowerCase()}">${order.status}</div>
@@ -472,6 +484,13 @@ app.get('/dashboard', isAuthenticated, (req, res) => {
   </style>
 </head>
 <body>
+<script>
+  window.onload = function() {
+    if (window.location.search.includes("order=success")) {
+      alert("Order placed!\nHappy shopping! 😊");
+    }
+  };
+</script>
   <div class="top-bar">
     <div class="logo">
       <img src="logo.png" alt="Trisha's Dairy Logo" />
@@ -2154,7 +2173,7 @@ app.post('/checkout', (req, res) => {
 
       req.session.cart = []; // Clear the cart
 
-      res.redirect('/dashboard'); // Success, go to dashboard
+      res.redirect('/dashboard?order=success'); /// redirect to dashboard with success msg.
     }
   );
 });
