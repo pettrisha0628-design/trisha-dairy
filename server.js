@@ -302,6 +302,369 @@ app.post('/login', (req, res) => {
   });
 });
 
+// isAuthenticated middleware
+function isAuthenticated(req, res, next) {
+  if (req.session && req.session.user) return next();
+  res.redirect('/login.html');
+}
+
+// DYNAMIC DASHBOARD ROUTE
+app.get('/dashboard', isAuthenticated, (req, res) => {
+  const user = req.session.user;
+
+  // 1. Get user info from DB
+  db.query('SELECT * FROM users WHERE id = ?', [user.id], (err, userResults) => {
+    if (err || userResults.length === 0) {
+      return res.status(500).send('Database error fetching user');
+    }
+    const dbUser = userResults[0];
+
+    // 2. Fetch recent orders + stats for this user
+    db.query(
+      `
+      SELECT o.*, 
+        GROUP_CONCAT(CONCAT(oi.qty, ' x ', p.product_name, ' (₹', oi.price, ')') SEPARATOR ', ') AS products
+      FROM orders o
+      JOIN order_items oi ON o.order_id = oi.order_id
+      JOIN products p ON oi.product_id = p.product_id
+      WHERE o.user_id = ?
+      GROUP BY o.order_id
+      ORDER BY o.order_date DESC
+      LIMIT 10
+      `,
+      [user.id],
+      (err, orderResults) => {
+        if (err) return res.status(500).send('Database error fetching orders');
+
+        const totalOrders = orderResults.length;
+        const pendingOrders = orderResults.filter(o => o.status === 'Processing').length;
+        const totalSpent = orderResults.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
+        const rating = dbUser.rating || '5★';
+
+        let ordersHtml = '';
+        orderResults.forEach(order => {
+          ordersHtml += `
+            <div class="order-item">
+              <div class="order-info">
+                <h4>Order #${order.order_id}</h4>
+                <p>${order.products}</p>
+                <p>Placed on ${order.order_date}</p>
+              </div>
+              <div class="order-status status-${order.status.toLowerCase()}">${order.status}</div>
+            </div>
+          `;
+        });
+
+        // Dash HTML below -- fill with live values!
+        res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User Dashboard - Trisha's Dairy</title>
+  <style>
+    :root {
+      --primary: #e8eaed;
+      --secondary: #d1d5db;
+      --accent1: #6b7280;
+      --accent2: #4f46e5;
+      --text: #374151;
+      --shadow: rgba(107, 114, 128, 0.2);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--primary);
+      color: var(--text);
+    }
+
+    .top-bar {
+      width: 100%;
+      height: 70px;
+      background: var(--accent2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      box-shadow: 0 2px 6px var(--shadow);
+    }
+
+    .top-bar .logo img {
+      height: 50px;
+    }
+
+    .top-bar .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      color: var(--primary);
+    }
+
+    .top-bar .user-menu a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+
+    .top-bar .user-menu a:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .container {
+      display: flex;
+      min-height: calc(100vh - 70px);
+    }
+
+    .sidebar {
+      width: 280px;
+      background: var(--secondary);
+      padding: 30px 20px;
+      box-shadow: 2px 0 5px var(--shadow);
+    }
+
+    .user-profile {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 20px;
+      background: var(--primary);
+      border-radius: 12px;
+    }
+
+    .user-profile img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 15px;
+      border: 3px solid var(--accent2);
+    }
+
+    .user-profile h3 {
+      margin: 0 0 5px 0;
+      color: var(--accent2);
+      font-weight: 600;
+    }
+
+    .user-profile p {
+      margin: 0;
+      color: var(--accent1);
+      font-size: 14px;
+    }
+
+    .sidebar-nav {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-nav li {
+      margin-bottom: 10px;
+    }
+
+    .sidebar-nav a {
+      display: block;
+      padding: 15px 20px;
+      text-decoration: none;
+      color: var(--text);
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .sidebar-nav a:hover, .sidebar-nav a.active {
+      background: var(--accent2);
+      color: var(--primary);
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 40px;
+    }
+
+    .dashboard-header {
+      margin-bottom: 40px;
+    }
+
+    .dashboard-header h1 {
+      font-size: 2.2rem;
+      color: var(--accent2);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .dashboard-header p {
+      color: var(--accent1);
+      font-size: 1.1rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: var(--secondary);
+      padding: 30px 25px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 12px var(--shadow);
+      transition: transform 0.3s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-card h3 {
+      font-size: 2rem;
+      color: var(--accent2);
+      margin: 0 0 10px 0;
+      font-weight: 700;
+    }
+
+    .stat-card p {
+      margin: 0;
+      color: var(--accent1);
+      font-weight: 600;
+    }
+
+    .recent-orders {
+      background: var(--secondary);
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .recent-orders h2 {
+      color: var(--accent2);
+      margin-bottom: 25px;
+      font-weight: 700;
+    }
+
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background: var(--primary);
+      border-radius: 8px;
+      margin-bottom: 15px;
+      transition: transform 0.2s;
+    }
+
+    .order-item:hover {
+      transform: translateX(5px);
+    }
+
+    .order-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .order-info h4 {
+      margin: 0 0 5px 0;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .order-info p {
+      margin: 0;
+      color: var(--accent1);
+      font-size: 14px;
+    }
+
+    .order-status {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-delivered {
+      background: #22c55e;
+      color: white;
+    }
+
+    .status-processing {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .status-shipped {
+      background: var(--accent2);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="logo">
+      <img src="logo.png" alt="Trisha's Dairy Logo" />
+    </div>
+    <div class="user-menu">
+      <span>Welcome, ${dbUser.user_name || ''}!</span>
+      <a href="index.html">Home</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+  <div class="container">
+    <div class="sidebar">
+      <div class="user-profile">
+        <img src="profile.png" alt="User Profile" />
+        <h3>${dbUser.user_name || ''}</h3>
+        <p>${dbUser.email || ''}</p>
+      </div>
+      <ul class="sidebar-nav">
+        <li><a href="#" class="active">Dashboard</a></li>
+        <li><a href="#">My Orders</a></li>
+        <li><a href="#">Order History</a></li>
+        <li><a href="#">Profile Settings</a></li>
+        <li><a href="#">Address Book</a></li>
+        <li><a href="#">Support</a></li>
+      </ul>
+    </div>
+    <div class="main-content">
+      <div class="dashboard-header">
+        <h1>Dashboard</h1>
+        <p>Welcome back! Here's what's happening with your account.</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>${totalOrders}</h3>
+          <p>Total Orders</p>
+        </div>
+        <div class="stat-card">
+          <h3>${pendingOrders}</h3>
+          <p>Pending Orders</p>
+        </div>
+        <div class="stat-card">
+          <h3>₹${totalSpent}</h3>
+          <p>Total Spent</p>
+        </div>
+        <div class="stat-card">
+          <h3>${rating}</h3>
+          <p>Customer Rating</p>
+        </div>
+      </div>
+      <div class="recent-orders">
+        <h2>Recent Orders</h2>
+        ${ordersHtml}
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+        `);
+      }
+    );
+  });
+});
+
 
 // products route with dynamic product cards
 app.get('/products.html', (req, res) => {
