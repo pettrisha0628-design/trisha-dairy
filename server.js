@@ -244,13 +244,23 @@ app.post('/register', (req, res) => {
       db.query(
         'INSERT INTO users (user_name, email, phone, city, password) VALUES (?, ?, ?, ?, ?)',
         [user_name, email, phone, city, hashedPassword],
-        (insertErr) => {
+        (insertErr, insertRes) => {
           if (insertErr) {
             console.error('Error inserting user:', insertErr);
             return res.status(500).send('Database error');
           }
-          req.session.user = user_name;  // Log the user in by setting session
-          res.redirect('/dashboard');    // Redirect to the dashboard immediately
+          // Now lookup the new user row for session
+          db.query('SELECT * FROM users WHERE user_name = ?', [user_name], (userErr, userRes) => {
+            if (userErr || userRes.length === 0) {
+              return res.status(500).send('User lookup failed.');
+            }
+            req.session.user = {
+              id: userRes[0].id,
+              user_name: userRes[0].user_name,
+              email: userRes[0].email
+            };
+            res.redirect('/dashboard');
+          });
         }
       );
     });
@@ -278,7 +288,11 @@ app.post('/login', (req, res) => {
         return res.status(500).send('Authentication error');
       }
       if (isMatch) {
-        req.session.user = user_name; 
+        req.session.user = {
+          id: user.id,
+          user_name: user.user_name,
+          email: user.email
+        };
         res.redirect('/dashboard');
       } else {
         res.status(401).send('Invalid username or password');
@@ -286,6 +300,7 @@ app.post('/login', (req, res) => {
     });
   });
 });
+
 
 //products route with dynamic product cards
 app.get('/products.html', (req, res) => {
