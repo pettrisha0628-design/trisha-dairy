@@ -231,7 +231,8 @@ app.post('/register', (req, res) => {
   db.query('SELECT * FROM users WHERE user_name = ? OR email = ?', [user_name, email], (err, results) => {
     if (err) {
       console.error('Database error:', err);
-      return res.status(500).send('Database error');
+      return res.status(500).send('Database error<br>' + JSON.stringify(err));
+
     }
     if (results.length > 0) {
       return res.status(400).send('Username or email already registered.');
@@ -247,7 +248,8 @@ app.post('/register', (req, res) => {
         (insertErr, insertRes) => {
           if (insertErr) {
             console.error('Error inserting user:', insertErr);
-            return res.status(500).send('Database error');
+            return res.status(500).send('Database error<br>' + JSON.stringify(err));
+
           }
           // Now lookup the new user row for session
           db.query('SELECT * FROM users WHERE user_name = ?', [user_name], (userErr, userRes) => {
@@ -308,7 +310,8 @@ app.get('/products.html', (req, res) => {
   const user = req.session.user;
 
   db.query('SELECT * FROM products', (err, products) => {
-    if (err) return res.send('Error loading products.');
+    return res.status(500).send('Database error<br>' + JSON.stringify(err));
+
 
 
 // build product cards html 
@@ -411,7 +414,7 @@ app.get('/dashboard', isAuthenticated, (req, res) => {
   const currentUser = req.session.user;
 
   db.query('SELECT * FROM users WHERE user_name = ?', [currentUser], (err, userResults) => {
-    if (err) return res.status(500).send('Database error');
+    return res.status(500).send('Database error<br>' + JSON.stringify(err));
     if (userResults.length === 0) return res.status(404).send('User not found');
     const user = userResults[0];
 
