@@ -748,12 +748,11 @@ app.get('/products.html', (req, res) => {
         <li><a href="about.html">About Us</a></li>
         <li><a href="search.html">Search</a></li>
         <li><a href="contact.html">Contact</a></li>
-        ${
-          user
-            ? `<li><a href="/cart"><img src="cart.png" style="height: 20px; vertical-align: middle;"> Cart</a></li>
-                <li>Welcome, ${user.user_name} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
-            : `<li><a href="login.html">Login/Register</a></li>`
-        }
+         ${
+  user
+    ? `<li><a href="/cart"><img src="cart.png" alt="Cart" style="height: 20px; vertical-align: middle;"> Cart</a></li><li>Welcome, ${user.user_name} <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
+    : `<li><a href="login.html">Login/Register</a></li>`
+}
       </ul>
     </nav>
   </header>
@@ -1342,11 +1341,10 @@ app.get('/search.html', (req, res) => {
         <li><a href="search.html" class="active">Search</a></li>
         <li><a href="contact.html">Contact</a></li>
         ${
-          user
-            ? `<li><a href="/cart"><img src="cart.png" style="height: 20px; vertical-align: middle;"> Cart</a></li>
-                <li>Welcome, ${user} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
-            : `<li><a href="login.html">Login/Register</a></li>`
-        }
+  user
+    ? `<li><a href="/cart"><img src="cart.png" alt="Cart" style="height: 20px; vertical-align: middle;"> Cart</a></li><li>Welcome, ${user.user_name} <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
+    : `<li><a href="login.html">Login/Register</a></li>`
+}
       </ul>
     </nav>
   </header>
@@ -1629,12 +1627,11 @@ app.get('/about.html', (req, res) => {
         <li><a href="about.html" class="active">About Us</a></li>
         <li><a href="search.html">Search</a></li>
         <li><a href="contact.html">Contact</a></li>
-        ${
-          user
-            ? `<li><a href="/cart"><img src="cart.png" style="height: 20px; vertical-align: middle;"> Cart</a></li>
-                <li>Welcome, ${user} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
-            : `<li><a href="login.html">Login/Register</a></li>`
-        }
+         ${
+  user
+    ? `<li><a href="/cart"><img src="cart.png" alt="Cart" style="height: 20px; vertical-align: middle;"> Cart</a></li><li>Welcome, ${user.user_name} <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
+    : `<li><a href="login.html">Login/Register</a></li>`
+}
       </ul>
     </nav>
   </header>
@@ -1911,11 +1908,10 @@ app.get('/contact.html', (req, res) => {
         <li><a href="search.html">Search</a></li>
         <li><a href="contact.html" class="active">Contact</a></li>
         ${
-          user
-            ? `<li><a href="/cart"><img src="cart.png" style="height: 20px; vertical-align: middle;"> Cart</a></li>
-                <li>Welcome, ${user} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
-            : `<li><a href="login.html">Login/Register</a></li>`
-        }
+  user
+    ? `<li><a href="/cart"><img src="cart.png" alt="Cart" style="height: 20px; vertical-align: middle;"> Cart</a></li><li>Welcome, ${user.user_name} <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
+    : `<li><a href="login.html">Login/Register</a></li>`
+}
       </ul>
     </nav>
   </header>
@@ -2325,11 +2321,11 @@ app.get('/checkout', (req, res) => {
             <li><a href="search.html">Search</a></li>
             <li><a href="contact.html">Contact</a></li>
             ${
-              user
-                ? `<li><a href="/cart"><img src="cart.png" style="height: 20px; vertical-align: middle;"> Cart</a></li>
-                  <li>Welcome, ${user} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
-                : `<li><a href="login.html">Login/Register</a></li>`
-            }
+  user
+    ? `<li><a href="/cart"><img src="cart.png" alt="Cart" style="height: 20px; vertical-align: middle;"> Cart</a></li><li>Welcome, ${user.user_name} <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
+    : `<li><a href="login.html">Login/Register</a></li>`
+}
+            
           </ul>
         </nav>
       </header>
