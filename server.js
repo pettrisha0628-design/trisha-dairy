@@ -823,7 +823,7 @@ app.post('/api/contact', (req, res) => {
 // Dynamic Cart Route - Your Design with Session Data
 app.get('/cart', isAuthenticated, (req, res) => {
   const cart = req.session.cart || [];
-  const currentUser = req.session.user;
+  const user = req.session.user;
 
   if (cart.length === 0) {
     // Empty cart HTML
@@ -867,11 +867,12 @@ app.get('/cart', isAuthenticated, (req, res) => {
         <li><a href="search.html">Search</a></li>
         <li><a href="contact.html">Contact</a></li>
         <li><a href="/cart" class="active">Cart</a></li>
-         ${
+        ${
   user
-    ? `<li><a href="/cart"><img src="cart.png" alt="Cart" style="height: 20px; vertical-align: middle;"> Cart</a></li><li>Welcome, ${user.user_name} <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
+    ? `<li>Welcome, ${user.user_name} <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
     : `<li><a href="login.html">Login/Register</a></li>`
 }
+
       </ul>
     </nav>
   </header>
