@@ -419,6 +419,10 @@ app.get('/dashboard', isAuthenticated, (req, res) => {
       const totalSpent = orderResults.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
       const rating = user.rating || '5★';
 
+
+      let ordersHtml = '';
+
+
       // Orders list HTML
       ordersHtml += `
   <div class="order-item">
