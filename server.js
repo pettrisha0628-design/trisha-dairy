@@ -303,6 +303,11 @@ app.get('/products.html', (req, res) => {
     <p>${product.description}</p>
     <p>₹ ${product.price}</p>
     <p>In stock: ${product.stock}</p>
+    <form method="POST" action="/add-to-cart" style="display:inline;">
+      <input type="hidden" name="product_id" value="${product.product_id}" />
+      <input type="hidden" name="qty" value="1" />
+      <button class="cart-btn" type="submit">Add to Cart</button>
+    </form>
     <form method="POST" action="/buy-now" style="display:inline;">
       <input type="hidden" name="product_id" value="${product.product_id}" />
       <input type="hidden" name="qty" value="1" />
@@ -310,6 +315,7 @@ app.get('/products.html', (req, res) => {
     </form>
   </div>
 `).join('');
+
 
 
     res.send(`
@@ -395,16 +401,16 @@ app.get('/dashboard', isAuthenticated, (req, res) => {
 
     // Main JOIN query for orders + products
     db.query(`
-      SELECT o.*, 
-        GROUP_CONCAT(CONCAT(oi.qty, 'x ', p.product_name, ' (₹', oi.price, ')') SEPARATOR ', ') AS products
-      FROM orders o
-      JOIN order_items oi ON o.order_id = oi.order_id
-      JOIN products p ON oi.product_id = p.product_id
-      WHERE o.user_id = ?
-      GROUP BY o.order_id
-      ORDER BY o.order_date DESC
-      LIMIT 10
-    `, [user.id], (err, orderResults) => {
+  SELECT o.*, 
+    GROUP_CONCAT(CONCAT(oi.qty, 'x ', p.product_name, ' (₹', oi.price, ')') SEPARATOR ', ') AS products
+  FROM orders o
+  JOIN order_items oi ON o.order_id = oi.order_id
+  JOIN products p ON oi.product_id = p.product_id
+  WHERE o.user_id = ?
+  GROUP BY o.order_id
+  ORDER BY o.order_date DESC
+  LIMIT 10
+`, [user.id], (err, orderResults) => {
       if (err) return res.status(500).send('Database error (orders)');
 
       // Stats
@@ -414,19 +420,16 @@ app.get('/dashboard', isAuthenticated, (req, res) => {
       const rating = user.rating || '5★';
 
       // Orders list HTML
-      let ordersHtml = '';
-      orderResults.forEach(order => {
-        ordersHtml += `
-          <div class="order-item">
-            <div class="order-info">
-              <h4>Order #${order.order_id}</h4>
-              <p><b>Products:</b> ${order.products}</p>
-              <p>Placed on ${order.order_date}</p>
-            </div>
-            <div class="order-status status-${order.status.toLowerCase()}">${order.status}</div>
-          </div>
-        `;
-      });
+      ordersHtml += `
+  <div class="order-item">
+    <div class="order-info">
+      <h4>Order #${order.order_id}</h4>
+      <p><b>Products:</b> ${order.products}</p>
+      <p>Placed on ${order.order_date}</p>
+    </div>
+    <div class="order-status status-${order.status.toLowerCase()}">${order.status}</div>
+  </div>
+`;
 
       // Render dashboard HTML with dynamic data
       res.send(`
@@ -885,6 +888,33 @@ app.post('/remove-from-cart', isAuthenticated, (req, res) => {
   if (!req.session.cart) req.session.cart = [];
   req.session.cart = req.session.cart.filter(item => item.product_id != product_id);
   res.redirect('/cart');
+});
+
+
+// Buy now route.
+app.post('/buy-now', isAuthenticated, (req, res) => {
+  const { product_id, qty } = req.body;
+  db.query('SELECT * FROM products WHERE product_id = ?', [product_id], (err, results) => {
+    if (err || results.length === 0) {
+      return res.send('Product not found!');
+    }
+    const product = results[0];
+
+    if (!req.session.cart) req.session.cart = [];
+
+    const index = req.session.cart.findIndex(item => item.product_id == product_id);
+    if (index !== -1) {
+      req.session.cart[index].qty += parseInt(qty);
+    } else {
+      req.session.cart.push({
+        product_id: product.product_id,
+        product_name: product.product_name,
+        price: product.price,
+        qty: parseInt(qty)
+      });
+    }
+    res.redirect('/checkout');
+  });
 });
 
 // search route with dynamic content
