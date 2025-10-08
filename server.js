@@ -851,7 +851,7 @@ app.post('/add-to-cart', isAuthenticated, (req, res) => {
 
     if (!req.session.cart) req.session.cart = [];
 
-    const index = req.session.cart.findIndex(item => item.productid == productid);
+    const index = req.session.cart.findIndex(item => item.product_id == product_id);
     if (index !== -1) {
       req.session.cart[index].qty += parseInt(qty);
     } else {
@@ -2190,7 +2190,7 @@ app.post('/checkout', (req, res) => {
   db.query(
     `INSERT INTO orders (user_id, delivery_name, delivery_address, city, pincode, phone, instructions, payment_method, order_date, status)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)`,
-    [user, `${firstName} ${lastName}`, address, city, pincode, phone, instructions, payment_method, 'Processing'],
+    [user.id, `${firstName} ${lastName}`, address, city, pincode, phone, instructions, payment_method, 'Processing'],
     (err, result) => {
       if (err) {
         console.error('Error placing order:', err);
