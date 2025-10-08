@@ -232,7 +232,6 @@ app.post('/register', (req, res) => {
     if (err) {
       console.error('Database error:', err);
       return res.status(500).send('Database error<br>' + JSON.stringify(err));
-
     }
     if (results.length > 0) {
       return res.status(400).send('Username or email already registered.');
@@ -240,21 +239,20 @@ app.post('/register', (req, res) => {
     bcrypt.hash(password, saltRounds, (hashErr, hashedPassword) => {
       if (hashErr) {
         console.error('Hashing error:', hashErr);
-        return res.status(500).send('Error processing password');
+        return res.status(500).send('Error processing password<br>' + JSON.stringify(hashErr));
       }
       db.query(
         'INSERT INTO users (user_name, email, phone, city, password) VALUES (?, ?, ?, ?, ?)',
         [user_name, email, phone, city, hashedPassword],
-        (insertErr, insertRes) => {
+        (insertErr) => {
           if (insertErr) {
             console.error('Error inserting user:', insertErr);
-            return res.status(500).send('Database error<br>' + JSON.stringify(err));
-
+            return res.status(500).send('Database error<br>' + JSON.stringify(insertErr));
           }
-          // Now lookup the new user row for session
+          // Fetch the newly inserted user for session
           db.query('SELECT * FROM users WHERE user_name = ?', [user_name], (userErr, userRes) => {
             if (userErr || userRes.length === 0) {
-              return res.status(500).send('User lookup failed.');
+              return res.status(500).send('User lookup failed after registration.<br>' + JSON.stringify(userErr));
             }
             req.session.user = {
               id: userRes[0].id,
@@ -269,6 +267,7 @@ app.post('/register', (req, res) => {
   });
 });
 
+
 // Login route with password verification
 app.post('/login', (req, res) => {
   const { user_name, password } = req.body;
@@ -277,10 +276,9 @@ app.post('/login', (req, res) => {
   }
   db.query('SELECT * FROM users WHERE user_name = ?', [user_name], (err, results) => {
     if (err) {
-    console.error('Database error:', err); // for logs
-    res.status(500).send('Database error<br>' + JSON.stringify(err));
-    return;
-  }
+      console.error(err);
+      return res.status(500).send('Database error<br>' + JSON.stringify(err));
+    }
     if (results.length === 0) {
       return res.status(401).send('Invalid username or password');
     }
@@ -288,7 +286,7 @@ app.post('/login', (req, res) => {
     bcrypt.compare(password, user.password, (compareErr, isMatch) => {
       if (compareErr) {
         console.error('Comparison error:', compareErr);
-        return res.status(500).send('Authentication error');
+        return res.status(500).send('Authentication error<br>' + JSON.stringify(compareErr));
       }
       if (isMatch) {
         req.session.user = {
