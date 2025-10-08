@@ -410,25 +410,27 @@ app.get('/products.html', (req, res) => {
 
 app.get('/dashboard', isAuthenticated, (req, res) => {
   const currentUser = req.session.user;
+  // Make sure currentUser is the user object from session
 
-  db.query('SELECT * FROM users WHERE user_name = ?', [currentUser], (err, userResults) => {
-    return res.status(500).send('Database error<br>' + JSON.stringify(err));
+  // Use the id field for SQL lookup:
+  db.query('SELECT * FROM users WHERE id = ?', [currentUser.id], (err, userResults) => {
+    if (err) return res.status(500).send('Database error<br>' + JSON.stringify(err));
     if (userResults.length === 0) return res.status(404).send('User not found');
     const user = userResults[0];
 
     // Main JOIN query for orders + products
     db.query(`
-  SELECT o.*, 
-    GROUP_CONCAT(CONCAT(oi.qty, 'x ', p.product_name, ' (₹', oi.price, ')') SEPARATOR ', ') AS products
-  FROM orders o
-  JOIN order_items oi ON o.order_id = oi.order_id
-  JOIN products p ON oi.product_id = p.product_id
-  WHERE o.user_id = ?
-  GROUP BY o.order_id
-  ORDER BY o.order_date DESC
-  LIMIT 10
-`, [user.id], (err, orderResults) => {
-      if (err) return res.status(500).send('Database error (orders)');
+      SELECT o.*, 
+        GROUP_CONCAT(CONCAT(oi.qty, 'x ', p.product_name, ' (₹', oi.price, ')') SEPARATOR ', ') AS products
+      FROM orders o
+      JOIN order_items oi ON o.order_id = oi.order_id
+      JOIN products p ON oi.product_id = p.product_id
+      WHERE o.user_id = ?
+      GROUP BY o.order_id
+      ORDER BY o.order_date DESC
+      LIMIT 10
+    `, [user.id], (err, orderResults) => {
+      if (err) return res.status(500).send('Database error (orders)<br>' + JSON.stringify(err));
 
       // Stats
       const totalOrders = orderResults.length;
@@ -436,24 +438,20 @@ app.get('/dashboard', isAuthenticated, (req, res) => {
       const totalSpent = orderResults.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
       const rating = user.rating || '5★';
 
-
-     let ordersHtml = '';
-// order items html.
-orderResults.forEach(order => {
-  ordersHtml += `
-    <div class="order-item">
-      <div class="order-info">
-        <h4>Order #${order.order_id}</h4>
-        <p><b>Products:</b> ${order.products}</p>
-        <p>Placed on ${order.order_date}</p>
-      </div>
-      <div class="order-status status-${order.status.toLowerCase()}">${order.status}</div>
-    </div>
-  `;
-});
-
-
-      // Render dashboard HTML with dynamic data
+      let ordersHtml = '';
+      orderResults.forEach(order => {
+        ordersHtml += `
+          <div class="order-item">
+            <div class="order-info">
+              <h4>Order #${order.order_id}</h4>
+              <p><b>Products:</b> ${order.products}</p>
+              <p>Placed on ${order.order_date}</p>
+            </div>
+            <div class="order-status status-${order.status.toLowerCase()}">${order.status}</div>
+          </div>
+        `;
+      });
+      //*
       res.send(`
 <!DOCTYPE html>
 <html lang="en">
@@ -694,9 +692,21 @@ app.get('/cart', isAuthenticated, (req, res) => {
     `);
   }
 
-  // Fetch product details for cart items
-  const productIds = cart.map(item => item.product_id);
-  db.query('SELECT * FROM products WHERE product_id IN (?)', [productIds], (err, products) => {
+ // Fetch product details for cart items
+const productIds = cart.map(item => item.product_id);
+
+if (productIds.length === 0) {
+  // Optional: handle empty cart logic
+  res.send("Your cart is empty!");
+  return;
+}
+
+// Generate the correct number of placeholders for the IN clause
+const placeholders = productIds.map(() => '?').join(',');
+db.query(
+  `SELECT * FROM products WHERE product_id IN (${placeholders})`,
+  productIds,
+  (err, products) => {
     if (err) {
       return res.status(500).send('Database error loading cart.');
     }
@@ -710,33 +720,33 @@ app.get('/cart', isAuthenticated, (req, res) => {
       if (product) {
         const itemTotal = product.price * cartItem.qty;
         subtotal += itemTotal;
-        
+
         cartItemsHtml += `
-        <div class="cart-item">
-          <img src="${product.image_url}" alt="${product.product_name}" />
-          <div class="item-details">
-            <h3>${product.product_name}</h3>
-            <p>${product.description}</p>
-          </div>
-          <div class="quantity-controls">
-            <form method="POST" action="/update-cart" style="display: inline;">
+          <div class="cart-item">
+            <img src="${product.image_url}" alt="${product.product_name}" />
+            <div class="item-details">
+              <h3>${product.product_name}</h3>
+              <p>${product.description}</p>
+            </div>
+            <div class="quantity-controls">
+              <form method="POST" action="/update-cart" style="display: inline;">
+                <input type="hidden" name="product_id" value="${product.product_id}">
+                <input type="hidden" name="action" value="decrease">
+                <button type="submit" class="quantity-btn">-</button>
+              </form>
+              <span class="quantity">${cartItem.qty}</span>
+              <form method="POST" action="/update-cart" style="display: inline;">
+                <input type="hidden" name="product_id" value="${product.product_id}">
+                <input type="hidden" name="action" value="increase">
+                <button type="submit" class="quantity-btn">+</button>
+              </form>
+            </div>
+            <div class="item-price">₹${itemTotal}</div>
+            <form method="POST" action="/remove-from-cart" style="display: inline;">
               <input type="hidden" name="product_id" value="${product.product_id}">
-              <input type="hidden" name="action" value="decrease">
-              <button type="submit" class="quantity-btn">-</button>
-            </form>
-            <span class="quantity">${cartItem.qty}</span>
-            <form method="POST" action="/update-cart" style="display: inline;">
-              <input type="hidden" name="product_id" value="${product.product_id}">
-              <input type="hidden" name="action" value="increase">
-              <button type="submit" class="quantity-btn">+</button>
+              <button type="submit" class="remove-btn">Remove</button>
             </form>
           </div>
-          <div class="item-price">₹${itemTotal}</div>
-          <form method="POST" action="/remove-from-cart" style="display: inline;">
-            <input type="hidden" name="product_id" value="${product.product_id}">
-            <button type="submit" class="remove-btn">Remove</button>
-          </form>
-        </div>
         `;
       }
     });
@@ -745,6 +755,7 @@ app.get('/cart', isAuthenticated, (req, res) => {
     const discount = subtotal > 100 ? 10 : 0;
     const total = subtotal + deliveryFee - discount;
 
+    
     // Send full cart page with your exact design
     res.send(`
 <!DOCTYPE html>
