@@ -276,7 +276,7 @@ app.post('/login', (req, res) => {
   db.query('SELECT * FROM users WHERE user_name = ?', [user_name], (err, results) => {
     if (err) {
       console.error(err);
-      res.status(500).send('Database error<br>' + err.message);
+      return res.status(500).send('Database error<br>' + err.message);
     }
     if (results.length === 0) {
       return res.status(401).send('Invalid username or password');
