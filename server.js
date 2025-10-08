@@ -867,7 +867,11 @@ app.get('/cart', isAuthenticated, (req, res) => {
         <li><a href="search.html">Search</a></li>
         <li><a href="contact.html">Contact</a></li>
         <li><a href="/cart" class="active">Cart</a></li>
-        <li>Welcome, ${currentUser} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>
+         ${
+  user
+    ? `<li><a href="/cart"><img src="cart.png" alt="Cart" style="height: 20px; vertical-align: middle;"> Cart</a></li><li>Welcome, ${user.user_name} <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
+    : `<li><a href="login.html">Login/Register</a></li>`
+}
       </ul>
     </nav>
   </header>
@@ -1011,7 +1015,11 @@ db.query(
         <li><a href="search.html">Search</a></li>
         <li><a href="contact.html">Contact</a></li>
         <li><a href="/cart" class="active">Cart</a></li>
-        <li>Welcome, ${currentUser} | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>
+        <li>
+  Welcome, ${(currentUser && currentUser.user_name) ? currentUser.user_name : ''}
+  | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a>
+</li>
+
       </ul>
     </nav>
   </header>
