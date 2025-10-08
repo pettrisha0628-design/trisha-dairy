@@ -180,11 +180,11 @@ app.get(['/', '/index.html'], (req, res) => {
         <li><a href="about.html">About Us</a></li>
         <li><a href="search.html">Search</a></li>
         <li><a href="contact.html">Contact</a></li>
-       ${
-          user
-            ? `<li><a href="/cart"><img src="cart.png" alt="Cart" style="height: 20px; vertical-align: middle;"> Cart</a></li><li>Welcome, ${currentUser.user_name} <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
-            : `<li><a href="login.html">Login/Register</a></li>`
-        }
+    ${
+  user
+    ? `<li><a href="/cart"><img src="cart.png" alt="Cart" style="height: 20px; vertical-align: middle;"> Cart</a></li><li>Welcome, ${user.user_name} <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
+    : `<li><a href="login.html">Login/Register</a></li>`
+}
 
       </ul>
     </nav>
