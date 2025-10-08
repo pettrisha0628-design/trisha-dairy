@@ -420,20 +420,21 @@ app.get('/dashboard', isAuthenticated, (req, res) => {
       const rating = user.rating || '5★';
 
 
-      let ordersHtml = '';
-
-
-      // Orders list HTML
-      ordersHtml += `
-  <div class="order-item">
-    <div class="order-info">
-      <h4>Order #${order.order_id}</h4>
-      <p><b>Products:</b> ${order.products}</p>
-      <p>Placed on ${order.order_date}</p>
+     let ordersHtml = '';
+// order items html.
+orderResults.forEach(order => {
+  ordersHtml += `
+    <div class="order-item">
+      <div class="order-info">
+        <h4>Order #${order.order_id}</h4>
+        <p><b>Products:</b> ${order.products}</p>
+        <p>Placed on ${order.order_date}</p>
+      </div>
+      <div class="order-status status-${order.status.toLowerCase()}">${order.status}</div>
     </div>
-    <div class="order-status status-${order.status.toLowerCase()}">${order.status}</div>
-  </div>
-`;
+  `;
+});
+
 
       // Render dashboard HTML with dynamic data
       res.send(`
