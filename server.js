@@ -18,6 +18,17 @@ app.use(session({
   saveUninitialized: false,
 }));
 
+//function isAdmin(req, res, next) {
+ //   if (req.session && req.session.user && req.session.user.role === 'admin') {
+    //    return next(); // allow admin
+    //}
+   // return res.status(403).send('Access denied. Admins only.');
+//}
+//admin route.
+//app.get('/admin', isAdmin, (req, res) => {
+    //res.sendFile(__dirname + '/public/admin_dashboard.html');
+//});
+
 // Serve static files from public folder
 app.use(express.static('public'));
 
@@ -822,136 +833,131 @@ app.post('/api/contact', (req, res) => {
 
 // Dynamic Cart Route - Your Design with Session Data
 app.get('/cart', isAuthenticated, (req, res) => {
-  const cart = req.session.cart || [];
+  // Always guarantee cart is an array
+  const cart = Array.isArray(req.session.cart) ? req.session.cart : [];
+  req.session.cart = cart;
   const user = req.session.user;
 
+  // Handle "cart is empty" page
   if (cart.length === 0) {
-    // Empty cart HTML
     return res.send(`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shopping Cart - Trisha's Dairy</title>
-  <style>
-    :root {
-      --primary: #e8eaed;
-      --secondary: #d1d5db;
-      --accent1: #6b7280;
-      --accent2: #4f46e5;
-      --text: #374151;
-      --shadow: rgba(107, 114, 128, 0.2);
-    }
-    body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--primary); color: var(--text); }
-    header { display: flex; align-items: center; justify-content: space-between; padding: 10px 40px; background: var(--primary); box-shadow: 0 2px 8px var(--shadow); position: sticky; top: 0; z-index: 1000; }
-    .logo img { height: 60px; }
-    nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 25px; }
-    nav ul li a { text-decoration: none; font-weight: 600; color: var(--text); padding: 8px 16px; border-radius: 8px; transition: all 0.3s; }
-    nav ul li a:hover { background: var(--accent1); color: var(--primary); }
-    nav ul li a.active { background: var(--accent2); color: var(--primary); }
-    .empty-cart { text-align: center; padding: 60px; color: var(--accent1); }
-    .empty-cart h2 { color: var(--accent2); margin-bottom: 20px; }
-  </style>
-</head>
-<body>
-  <header>
-    <div class="logo">
-      <img src="logo.png" alt="Trisha's Dairy Logo" />
-    </div>
-    <nav>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="products.html">Products</a></li>
-        <li><a href="about.html">About Us</a></li>
-        <li><a href="search.html">Search</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li><a href="/cart" class="active">Cart</a></li>
-        ${
-  user
-    ? `<li>Welcome, ${user.user_name} <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
-    : `<li><a href="login.html">Login/Register</a></li>`
-}
-
-      </ul>
-    </nav>
-  </header>
-  <div class="empty-cart">
-    <h2>Your Cart is Empty</h2>
-    <p>Add some delicious dairy products to get started!</p>
-    <a href="/products.html">← Continue Shopping</a>
-  </div>
-</body>
-</html>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Shopping Cart - Trisha's Dairy</title>
+        <style>
+          :root {
+            --primary: #e8eaed;
+            --secondary: #d1d5db;
+            --accent1: #6b7280;
+            --accent2: #4f46e5;
+            --text: #374151;
+            --shadow: rgba(107, 114, 128, 0.2);
+          }
+          body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--primary); color: var(--text); }
+          header { display: flex; align-items: center; justify-content: space-between; padding: 10px 40px; background: var(--primary); box-shadow: 0 2px 8px var(--shadow); position: sticky; top: 0; z-index: 1000; }
+          .logo img { height: 60px; }
+          nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 25px; }
+          nav ul li a { text-decoration: none; font-weight: 600; color: var(--text); padding: 8px 16px; border-radius: 8px; transition: all 0.3s; }
+          nav ul li a:hover { background: var(--accent1); color: var(--primary); }
+          nav ul li a.active { background: var(--accent2); color: var(--primary); }
+          .empty-cart { text-align: center; padding: 60px; color: var(--accent1); }
+          .empty-cart h2 { color: var(--accent2); margin-bottom: 20px; }
+        </style>
+      </head>
+      <body>
+        <header>
+          <div class="logo">
+            <img src="logo.png" alt="Trisha's Dairy Logo" />
+          </div>
+          <nav>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="products.html">Products</a></li>
+              <li><a href="about.html">About Us</a></li>
+              <li><a href="search.html">Search</a></li>
+              <li><a href="contact.html">Contact</a></li>
+              <li><a href="/cart" class="active">Cart</a></li>
+              ${
+                user
+                  ? `<li>Welcome, ${user.user_name} <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a></li>`
+                  : `<li><a href="login.html">Login/Register</a></li>`
+              }
+            </ul>
+          </nav>
+        </header>
+        <div class="empty-cart">
+          <h2>Your Cart is Empty</h2>
+          <p>Add some delicious dairy products to get started!</p>
+          <a href="/products.html">← Continue Shopping</a>
+        </div>
+      </body>
+      </html>
     `);
   }
 
- // Fetch product details for cart items
-const productIds = cart.map(item => item.product_id);
+  // Cart has items
+  const productIds = cart.map(item => item.product_id).filter(pid => !!pid);
+  if (productIds.length === 0) {
+    return res.send("Your cart is empty!");
+  }
 
-if (productIds.length === 0) {
-  // Optional: handle empty cart logic
-  res.send("Your cart is empty!");
-  return;
-}
-
-// Generate the correct number of placeholders for the IN clause
-const placeholders = productIds.map(() => '?').join(',');
-db.query(
-  `SELECT * FROM products WHERE product_id IN (${placeholders})`,
-  productIds,
-  (err, products) => {
-    if (err) {
-      return res.status(500).send('Database error loading cart.');
-    }
-
-    // Generate cart items HTML
-    let cartItemsHtml = '';
-    let subtotal = 0;
-
-    cart.forEach(cartItem => {
-      const product = products.find(p => p.product_id === cartItem.product_id);
-      if (product) {
-        const itemTotal = product.price * cartItem.qty;
-        subtotal += itemTotal;
-
-        cartItemsHtml += `
-          <div class="cart-item">
-            <img src="${product.image_url}" alt="${product.product_name}" />
-            <div class="item-details">
-              <h3>${product.product_name}</h3>
-              <p>${product.description}</p>
-            </div>
-            <div class="quantity-controls">
-              <form method="POST" action="/update-cart" style="display: inline;">
-                <input type="hidden" name="product_id" value="${product.product_id}">
-                <input type="hidden" name="action" value="decrease">
-                <button type="submit" class="quantity-btn">-</button>
-              </form>
-              <span class="quantity">${cartItem.qty}</span>
-              <form method="POST" action="/update-cart" style="display: inline;">
-                <input type="hidden" name="product_id" value="${product.product_id}">
-                <input type="hidden" name="action" value="increase">
-                <button type="submit" class="quantity-btn">+</button>
-              </form>
-            </div>
-            <div class="item-price">₹${itemTotal}</div>
-            <form method="POST" action="/remove-from-cart" style="display: inline;">
-              <input type="hidden" name="product_id" value="${product.product_id}">
-              <button type="submit" class="remove-btn">Remove</button>
-            </form>
-          </div>
-        `;
+  const placeholders = productIds.map(() => '?').join(',');
+  db.query(
+    `SELECT * FROM products WHERE product_id IN (${placeholders})`,
+    productIds,
+    (err, products) => {
+      if (err) {
+        return res.status(500).send('Database error loading cart.');
       }
-    });
 
-    const deliveryFee = 25;
-    const discount = subtotal > 100 ? 10 : 0;
-    const total = subtotal + deliveryFee - discount;
+      // Generate cart items HTML and summary as you already do
+      let cartItemsHtml = '';
+      let subtotal = 0;
+      cart.forEach(cartItem => {
+        const product = products.find(p => p.product_id === cartItem.product_id);
+        if (product) {
+          const itemTotal = product.price * cartItem.qty;
+          subtotal += itemTotal;
+          cartItemsHtml += `
+            <div class="cart-item">
+              <img src="${product.image_url}" alt="${product.product_name}" />
+              <div class="item-details">
+                <h3>${product.product_name}</h3>
+                <p>${product.description}</p>
+              </div>
+              <div class="quantity-controls">
+                <form method="POST" action="/update-cart" style="display: inline;">
+                  <input type="hidden" name="product_id" value="${product.product_id}">
+                  <input type="hidden" name="action" value="decrease">
+                  <button type="submit" class="quantity-btn">-</button>
+                </form>
+                <span class="quantity">${cartItem.qty}</span>
+                <form method="POST" action="/update-cart" style="display: inline;">
+                  <input type="hidden" name="product_id" value="${product.product_id}">
+                  <input type="hidden" name="action" value="increase">
+                  <button type="submit" class="quantity-btn">+</button>
+                </form>
+              </div>
+              <div class="item-price">₹${itemTotal}</div>
+              <form method="POST" action="/remove-from-cart" style="display: inline;">
+                <input type="hidden" name="product_id" value="${product.product_id}">
+                <button type="submit" class="remove-btn">Remove</button>
+              </form>
+            </div>
+          `;
+        }
+      });
+
+      const deliveryFee = 25;
+      const discount = subtotal > 100 ? 10 : 0;
+      const total = subtotal + deliveryFee - discount;
 
 
     // Send full cart page with your exact design
-    res.send(`
+    return res.send(`
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1017,9 +1023,11 @@ db.query(
         <li><a href="contact.html">Contact</a></li>
         <li><a href="/cart" class="active">Cart</a></li>
         <li>
-  Welcome, ${(currentUser && currentUser.user_name) ? currentUser.user_name : ''}
+ <li>
+  Welcome, ${(user && user.user_name) ? user.user_name : ''}
   | <a href="/dashboard">Profile</a> | <a href="/logout">Logout</a>
 </li>
+
 
       </ul>
     </nav>
